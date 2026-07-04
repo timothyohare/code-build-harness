@@ -36,6 +36,31 @@ GitHub platform constraints on a **user-owned public** repo (`timothyohare/code-
 
 D-13 stands with this substitution. Revisit if/when the repo moves to an org.
 
+## Ratification 2026-07-05 (2) — extension questions Q21–Q27
+
+| Q | Answer | Consequence |
+|---|---|---|
+| Q21 | **Spring Boot is needed on the personal track too**; the rest (mobile, Angular, migrations, Sumo/Dynatrace) is enterprise. Work constraints to be provided later; Tim is exploring enterprise plans separately (with Fable). | Spring Boot profile moves up: it's now a personal-track deliverable, not gated on enterprise constraints. Enterprise chassis deployment deferred until constraints arrive. |
+| Q22 | Sequencing agreed | Chassis proof (M1–M3) remains first; extensions.md order stands |
+| Q23 | Agreed — humans own mapping spec + cutover (never graduates); rollback drills mandatory pre-cutover | Recorded as D-21 |
+| Q24 | **Correction to proposed default**: personal projects deploy on **AWS**, not GCP. OTel everywhere agreed. Enterprise uses Sumo Logic (SLOs) + Dynatrace. | o11y gate: OTel instrumentation (vendor-neutral) with **AWS-native backend (CloudWatch / Managed Prometheus — pick at implementation)** for personal; Sumo/Dynatrace query adapters are enterprise work. extensions.md §SLO updated. |
+| Q25 | Harness-native flags agreed; **explicit request: best practices for flag lifecycle** — fear is unbounded flag accumulation ("hard to track what's actually on") | Flag-lifecycle policy added to extensions.md (TTL on every flag, registry as code, stale-flag gate, cleanup as part of Simplify). Recorded as D-22. |
+| Q26 | Mobile scope cut confirmed | Realistic cut only; mobile remains last in sequence |
+| Q27 | Wrap the harness as the first MCP server | Future milestone after M5 |
+
+Section D notes from Tim: self-improving harness proposals are approved by a human;
+seeded-fault drills monthly; on comprehension debt he offered the C-compiler/assembly
+analogy — gates may become the new "compiler trust" boundary (accepted as a direction,
+with the review-phase explanation artifact as the safeguard while trust is earned).
+
+New decisions from this ratification:
+
+| ID | Decision | Status |
+|---|---|---|
+| D-21 | Migration loops: agents write shims/backfill/parity checks; humans own mapping spec and cutover (cutover never graduates); rollback drill is a mandatory gate before any cutover | **Final** |
+| D-22 | Feature flags are harness-native with a mandatory lifecycle: every flag declared in a registry file with owner + expiry; a stale-flag gate fails CI when a flag passes its expiry; flag removal is a standing Simplify-phase task | **Final** |
+| D-23 | Observability: OTel instrumentation everywhere; personal backend AWS-native; enterprise adapters (Sumo Logic, Dynatrace) deferred until work constraints are known | **Final** |
+
 | ID | Decision | Status | Rationale / evidence |
 |---|---|---|---|
 | D-1 | The loop is Spec → Plan → Build → Validate → Review → Simplify → Ship, run by a local loop controller; GitHub Actions is the outer verification/merge layer | **Firm** | Universal pattern; matches existing gates + installed skills (spike 1) |

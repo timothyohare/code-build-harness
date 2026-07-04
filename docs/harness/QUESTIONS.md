@@ -169,43 +169,50 @@ constraints apply?
 *Proposed default: treat as a second deployment target of the same chassis; the
 profile/add-on architecture in extensions.md is designed so nothing in v1 needs
 reworking either way.*
+support for spring boot will be needed on personal. The rest is on enterprise and i'm exploring plans using the latest model, Fable, to see what it comes up with. I can provide more work restrictions later.
 
 **Q22. Do you agree with the sequencing in extensions.md** (prove chassis on v1 →
 SLO/o11y add-on → Spring Boot profile → prod evals + A/B → messaging migration →
 DB migration → Angular/MCP → mobile last)? Or does work pressure force a different
 first target (e.g., Spring Boot before v1 is proven)?
 *Proposed default: as listed.*
+agree with proposed
 
 **Q23. Migration loops: agents write shims/backfill/parity checks, humans own the
 mapping spec and cutover decisions — agreed?** And rollback drills are mandatory
 gates before any cutover?
 *Proposed default: yes to both; cutover stays a hard human gate indefinitely (it
 never graduates).*
+agree to proposal
 
 **Q24. SLO stack**: where do the SLOs/telemetry live — GCP-native (Cloud Monitoring,
 given the Pub/Sub/Spanner direction), Grafana/Prometheus OSS, or Datadog-class SaaS?
 Determines the o11y gate's query interface.
 *Proposed default: OpenTelemetry instrumentation everywhere (vendor-neutral),
 GCP Cloud Monitoring as first backend given the Google direction.*
+So in my own projects, it's typically deployed on AWS. agree with OpenTelemetry instrumentation everywhere. At work it's Sumo Logic for SLOs and Dynatrace is also used.
 
 **Q25. A/B platform**: in-repo flag lib + JSONL assignment logging (harness-native,
 free) vs GrowthBook/Unleash-class platform from day 1?
 *Proposed default: harness-native until an experiment volume justifies a platform.*
+agree with proposed. Need best practices on managing feature flags. The concern I have is that eventually your production code has so many feature flags that it's hard to track what's actually switched on.
 
 **Q26. Mobile scope cut**: is "support iOS/Android" full app development through the
 loop, or the realistic v2 cut (domain/view-model layer TDD in the loop; UI/e2e on a
 nightly device lane; ship = release candidate, never store submission)?
 *Proposed default: the realistic cut.*
+Cut the mobile scope. 
 
 **Q27. MCP servers**: first MCP server target = wrapping the harness itself (gates/
 metrics/spec store as MCP tools for other agents), or an unrelated product server?
 *Proposed default: wrap the harness — dogfoods the profile and makes the harness
 consumable by every MCP-capable agent, which fits the multi-LLM direction.*
+agree with wrapping the harness.
 
 ## D. Open research questions (no answer needed — tracked for later)
 
 - Model-specificity of ratchet rules: are failure-mode rules portable across models, or per-model rule sets?
-- Self-improving harness: can the loop mine its own transcripts to propose new gates — and who approves those?
+- Self-improving harness: can the loop mine its own transcripts to propose new gates — and who approves those? Yes. Human
 - Cross-repo features (OpenSpec store model) — out of scope for v1.
-- Sensor adequacy drills: cadence for seeded-fault injection (monthly?).
-- Comprehension debt: what practice keeps you able to explain shipped code as volume grows ("I won't commit code I couldn't explain" — Willison)?
+- Sensor adequacy drills: cadence for seeded-fault injection (monthly?). Yes monthly.
+- Comprehension debt: what practice keeps you able to explain shipped code as volume grows ("I won't commit code I couldn't explain" — Willison)? Are we heading to a place where we don't know what the code is doing as long as it passes all of the gates? I think of it like a C compliler with assembly. Once people started using the C compiler they typically didn't look at the assembly. It was still possible, just would take more time and knowledged. 
