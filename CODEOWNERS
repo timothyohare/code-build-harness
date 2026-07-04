@@ -1,0 +1,9 @@
+# Trust model (docs/harness/architecture.md): these paths require human review.
+# Agents cannot approve changes here; the push ruleset additionally blocks direct
+# pushes to most of them.
+/tests/            @timothyohare
+/.github/          @timothyohare
+/harness/          @timothyohare
+/.claude/          @timothyohare
+/CODEOWNERS        @timothyohare
+/metrics/events/   @timothyohare

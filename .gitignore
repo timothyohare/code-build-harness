@@ -1,0 +1,5 @@
+node_modules/
+.env
+.env.*
+.harness-role
+docs/Day_1_v3.pdf

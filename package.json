@@ -1,0 +1,14 @@
+{
+  "name": "code-build-harness",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Agentic code build harness — Spec → Plan → Build → Validate → Review → Simplify → Ship with executable gates",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "lint": "find harness tests -name '*.mjs' -exec node --check {} +",
+    "test": "node --test tests/*.test.mjs"
+  }
+}
