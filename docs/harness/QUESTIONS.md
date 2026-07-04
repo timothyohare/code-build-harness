@@ -157,6 +157,51 @@ step that converts failures into new rules/gates)?
 *Proposed default: automatic note per escalation + a weekly retro pass you skim.*
 agree with proposal
 
+## E. Extension requirements (added 2026-07-05 — see `extensions.md` for the analysis)
+
+**Q21. Context check: are the new requirements (Spring Boot, Cassandra→Spanner/RDS,
+Solace/Kafka→Pub/Sub, mobile) for a work/enterprise environment, separate from the
+personal aitutor track?** This matters structurally: a work environment usually means
+GitHub Enterprise (different ruleset/App constraints), restricted model access
+(which cross-family reviewer is even allowed?), compliance/audit requirements, and a
+CI platform that might not be GitHub Actions (Cloud Build? Jenkins?). If yes: which
+constraints apply?
+*Proposed default: treat as a second deployment target of the same chassis; the
+profile/add-on architecture in extensions.md is designed so nothing in v1 needs
+reworking either way.*
+
+**Q22. Do you agree with the sequencing in extensions.md** (prove chassis on v1 →
+SLO/o11y add-on → Spring Boot profile → prod evals + A/B → messaging migration →
+DB migration → Angular/MCP → mobile last)? Or does work pressure force a different
+first target (e.g., Spring Boot before v1 is proven)?
+*Proposed default: as listed.*
+
+**Q23. Migration loops: agents write shims/backfill/parity checks, humans own the
+mapping spec and cutover decisions — agreed?** And rollback drills are mandatory
+gates before any cutover?
+*Proposed default: yes to both; cutover stays a hard human gate indefinitely (it
+never graduates).*
+
+**Q24. SLO stack**: where do the SLOs/telemetry live — GCP-native (Cloud Monitoring,
+given the Pub/Sub/Spanner direction), Grafana/Prometheus OSS, or Datadog-class SaaS?
+Determines the o11y gate's query interface.
+*Proposed default: OpenTelemetry instrumentation everywhere (vendor-neutral),
+GCP Cloud Monitoring as first backend given the Google direction.*
+
+**Q25. A/B platform**: in-repo flag lib + JSONL assignment logging (harness-native,
+free) vs GrowthBook/Unleash-class platform from day 1?
+*Proposed default: harness-native until an experiment volume justifies a platform.*
+
+**Q26. Mobile scope cut**: is "support iOS/Android" full app development through the
+loop, or the realistic v2 cut (domain/view-model layer TDD in the loop; UI/e2e on a
+nightly device lane; ship = release candidate, never store submission)?
+*Proposed default: the realistic cut.*
+
+**Q27. MCP servers**: first MCP server target = wrapping the harness itself (gates/
+metrics/spec store as MCP tools for other agents), or an unrelated product server?
+*Proposed default: wrap the harness — dogfoods the profile and makes the harness
+consumable by every MCP-capable agent, which fits the multi-LLM direction.*
+
 ## D. Open research questions (no answer needed — tracked for later)
 
 - Model-specificity of ratchet rules: are failure-mode rules portable across models, or per-model rule sets?

@@ -19,7 +19,11 @@ convergence to decisions. **Start with `QUESTIONS.md` — answering it unblocks 
 5. **[metrics.md](metrics.md)** — the JSONL event schema (approve via Q12),
    north-star metrics, experiment protocol, and the measured
    in-the-loop → on-the-loop → out-of-the-loop dial.
-6. **Phase guides** — the operating manual per loop phase, one template
+6. **[extensions.md](extensions.md)** — stack profiles (Spring Boot, Angular, mobile,
+   MCP servers), concern add-ons (SLOs/observability, production evals, A/B tests,
+   testcontainers policy), and migration loops (Cassandra→Spanner/RDS,
+   Solace/Kafka→Pub/Sub), with sequencing. Questions: QUESTIONS.md section E.
+7. **Phase guides** — the operating manual per loop phase, one template
    (entry → process → exit gate → enforcement → metrics → escalation):
    - [phases/01-spec.md](phases/01-spec.md) — EARS requirements, spec-ready bar
    - [phases/02-plan.md](phases/02-plan.md) — sprint contract, coverage matrix, ≤100-line tasks
