@@ -22,10 +22,12 @@
 └───────────────┬────────────────────────────────────────────────────────────┘
                 │ push (agent bot identity)
 ┌─ GITHUB (outer loop — slow, tamper-proof, "CI is law") ────────────────────┐
-│  Push rulesets: workflows/·harness config/·hooks/·CODEOWNERS = untouchable │
-│  PR: required checks (rerun everything) · test-path diff-check ·           │
-│      Copilot review (advisory) · CODEOWNERS review · SARIF → code scanning │
-│  MERGE QUEUE ► merge ► bundle archived with metrics                        │
+│  main is PR-only · `guard` required check (pull_request_target = base      │
+│    version runs, untamperable): protected paths + test paths need labels   │
+│  PR: required checks (rerun everything) · Copilot review (advisory) ·      │
+│      CODEOWNERS review · SARIF → code scanning                             │
+│  merge ► bundle archived with metrics   (merge queue: org repos only —     │
+│                                          deferred, see decisions.md)       │
 │  Nightly: mutation full · CodeQL · ZAP/Nuclei/Schemathesis · TruffleHog ·  │
 │           nmap ports-diff — vs ephemeral staging                           │
 └───────────────┬────────────────────────────────────────────────────────────┘

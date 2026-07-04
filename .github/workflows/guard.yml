@@ -1,0 +1,51 @@
+# Tamper-proof authorization check (D-4, D-13 — adapted, see decisions.md
+# "Ratification" note on push-ruleset availability).
+#
+# Runs on pull_request_target, so GitHub executes the BASE branch's version of
+# this file — a PR that modifies this workflow still gets judged by the version
+# already on main. This is the strongest server-side protection available on a
+# user-owned public repo (push rulesets require org-owned private repos).
+#
+# SECURITY: this workflow must NEVER check out or execute PR code. It only
+# reads the PR's file list via the API.
+name: guard
+
+on:
+  pull_request_target:
+  merge_group:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Protected-path and test-ownership authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+        run: |
+          if [ -z "$PR" ]; then
+            echo "merge_group run: authorization was already checked on the PR"
+            exit 0
+          fi
+          FILES=$(gh api "repos/$REPO/pulls/$PR/files" --paginate -q '.[].filename')
+          PROTECTED=$(echo "$FILES" | grep -E '^(\.github/|harness/(hooks|controller)/|\.claude/|CODEOWNERS)' || true)
+          TESTS=$(echo "$FILES" | grep -E '(^|/)tests?/|\.(test|spec)\.[jt]sx?$|_test\.py$' || true)
+          fail=0
+          if [ -n "$PROTECTED" ] && ! echo " $LABELS " | grep -q " harness-config-approved "; then
+            echo "::error::Protected harness paths changed without the 'harness-config-approved' label:"
+            echo "$PROTECTED"
+            fail=1
+          fi
+          if [ -n "$TESTS" ] && ! echo " $LABELS " | grep -q " tests-approved "; then
+            echo "::error::Test files changed without the 'tests-approved' label:"
+            echo "$TESTS"
+            fail=1
+          fi
+          [ "$fail" = 0 ] && echo "OK: all path authorizations satisfied"
+          exit $fail
