@@ -12,6 +12,9 @@ name: guard
 
 on:
   pull_request_target:
+    # labeled/unlabeled included so applying an authorization label re-runs the
+    # check (default types would leave the failed verdict stale after labeling).
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   merge_group:
 
 permissions:
