@@ -78,6 +78,12 @@ Two hook points already exist in the phase docs:
   Böckeler's runtime-monitoring sensor class, wired to the same escalation policy
   (D-11) as build-time gates.
 
+Backends (Q24, D-23): OTel instrumentation everywhere, vendor-neutral. Personal
+track deploys on **AWS** → CloudWatch or Amazon Managed Prometheus as the first
+query interface for the o11y/SLO gates. Enterprise uses Sumo Logic (SLOs) and
+Dynatrace — those query adapters are enterprise-deployment work, deferred until
+work constraints are known (Q21).
+
 Every later add-on (A/B, evals, migrations) *depends on this one* — they all need
 trustworthy production signals. Sequence it first.
 
@@ -111,6 +117,30 @@ is a gate artifact, and **guardrail-metric breach auto-kills the variant** via t
 error-budget machinery above. Note: the harness's own improvement experiments
 (metrics.md "experiment protocol") and product A/B tests are the same pattern at two
 altitudes — one implementation serves both.
+
+**Flag lifecycle policy (D-22 — answering the flag-debt concern directly).** The
+failure mode is well known: flags accumulate until nobody can say what's actually on
+in production. Every rule below is mechanical, not aspirational:
+
+1. **Registry as code**: every flag is declared in one file (`flags/registry.json`)
+   with: name, type (`release | experiment | ops-killswitch | permission`), owner,
+   created date, **expiry date** (mandatory for release/experiment types; only
+   ops-killswitches may be long-lived, and they get an annual re-justification date
+   instead), and a link to the change bundle that introduced it. Code referencing an
+   unregistered flag fails lint (a custom rule — same slot as architecture rules).
+2. **Stale-flag gate**: CI fails when `today > expiry` for any flag still referenced
+   in code. No exceptions — extending the expiry is a one-line PR, which is exactly
+   the visibility the gate exists to force.
+3. **Removal is a Simplify-phase standing task**: a release flag that has been 100%-on
+   for its full soak window becomes an auto-generated cleanup task (flag + dead branch
+   deleted — behavior-preserving, machine-checkable, so it's autonomous-safe per D-18).
+4. **State visibility**: production flag state is exported nightly to
+   `metrics/flag-state.json` — diffable, auditable, one place answering "what is
+   actually on right now"; drift between registry defaults and production state is a
+   retro trigger.
+5. **Budget**: a soft cap on live flags per service (start ~15); breaching it blocks
+   *new* flag creation until one is removed — the same ratchet-with-pruning
+   discipline as AGENTS.md rules (D-16).
 
 ### Mocks & test containers
 
