@@ -18,6 +18,24 @@ and deviations:
 
 All other questions: proposed default accepted as-is.
 
+### Amendment 2026-07-05 (discovered during M0 scaffolding)
+
+GitHub platform constraints on a **user-owned public** repo (`timothyohare/code-build-harness`):
+
+1. **Merge queue is organization-owned-repos only** — the `merge_queue` ruleset rule
+   is rejected on user repos. Q14's "on from day 1" is therefore deferred; option:
+   transfer the repo to a free org when parallel agents arrive (or sooner).
+2. **Push rulesets are org-owned AND non-public repos only** — the "block the push
+   itself" layer from D-13 is unavailable. Replacement with equivalent merge-blocking
+   strength: main is PR-only (branch ruleset), and a **`guard` required check runs on
+   `pull_request_target`** — GitHub executes the *base branch's* version of that
+   workflow, so a PR that tampers with workflows/hooks/harness config is judged by
+   the untampered guard and fails unless a human applied the `harness-config-approved`
+   label. Test-path changes likewise require `tests-approved`. Nothing ships without
+   merging, so blocking merge ≈ blocking push for trunk protection purposes.
+
+D-13 stands with this substitution. Revisit if/when the repo moves to an org.
+
 | ID | Decision | Status | Rationale / evidence |
 |---|---|---|---|
 | D-1 | The loop is Spec → Plan → Build → Validate → Review → Simplify → Ship, run by a local loop controller; GitHub Actions is the outer verification/merge layer | **Firm** | Universal pattern; matches existing gates + installed skills (spike 1) |

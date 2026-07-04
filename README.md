@@ -26,9 +26,12 @@ convergence (2026-07-04/05).
 
 - **Local**: PreToolUse hooks block agent edits to protected paths by role
   (`.harness-role`, written by the loop controller). Human sessions are unaffected.
-- **Server**: push rulesets block pushes touching `.github/**`, `harness/**`,
-  `.claude/**`, `CODEOWNERS`; the `test-ownership` CI check blocks unauthorized test
-  changes; CODEOWNERS requires human review; merge queue re-validates merged state.
+- **Server**: main is PR-only; the `guard` required check (runs the *base* branch's
+  workflow via `pull_request_target`, so PRs cannot tamper with it) fails any PR
+  touching `.github/**`, `harness/{hooks,controller}/**`, `.claude/**`, or
+  `CODEOWNERS` without the `harness-config-approved` label, and any test-path change
+  without `tests-approved`; CODEOWNERS requires human review. (Push rulesets and
+  merge queue need an org-owned repo — see decisions.md amendment 2026-07-05.)
 
 Note: `.claude/harness.json` maps gate-ci's `typecheck` slot to the unit tests until
 TypeScript lands here (there is nothing to typecheck yet; the Stop-hook gate then
