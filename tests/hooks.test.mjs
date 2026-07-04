@@ -108,3 +108,4 @@ test('human role bypasses bash guard', () => {
   const r = runHook('bash-guard.mjs', 'Bash', { command: 'rm -rf build' }, null);
   assert.equal(r.status, 0);
 });
+// tamper
