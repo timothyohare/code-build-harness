@@ -31,7 +31,11 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
     fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
   };
   const loadState = () => {
-    try { return JSON.parse(fs.readFileSync(statePath, 'utf8')); } catch { return null; }
+    try {
+      return JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    } catch {
+      return null;
+    }
   };
 
   function writeHandoff(state, reason) {
@@ -39,23 +43,29 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
     fs.mkdirSync(dir, { recursive: true });
     const file = path.join(dir, `${taskId}.md`);
     const attempts = state.history
-      .map((h, i) => `${i + 1}. [iter ${h.iteration}] ${h.step} → gate ${h.gate}: ${h.pass ? 'pass' : 'FAIL'}${h.detail ? ` — ${h.detail}` : ''}`)
+      .map(
+        (h, i) =>
+          `${i + 1}. [iter ${h.iteration}] ${h.step} → gate ${h.gate}: ${h.pass ? 'pass' : 'FAIL'}${h.detail ? ` — ${h.detail}` : ''}`,
+      )
       .join('\n');
-    fs.writeFileSync(file, [
-      `# Handoff: ${taskId}`,
-      ``,
-      `**Escalated:** ${new Date().toISOString()}`,
-      `**Reason:** ${reason}`,
-      ``,
-      `## What was tried`,
-      attempts || '(no iterations recorded)',
-      ``,
-      `## Blocking gate`,
-      state.blockingGate ?? 'n/a',
-      ``,
-      `## Notes for the human`,
-      `State file: memory/loop-state/${taskId}.json — resume with the loop CLI after intervention.`,
-    ].join('\n'));
+    fs.writeFileSync(
+      file,
+      [
+        `# Handoff: ${taskId}`,
+        ``,
+        `**Escalated:** ${new Date().toISOString()}`,
+        `**Reason:** ${reason}`,
+        ``,
+        `## What was tried`,
+        attempts || '(no iterations recorded)',
+        ``,
+        `## Blocking gate`,
+        state.blockingGate ?? 'n/a',
+        ``,
+        `## Notes for the human`,
+        `State file: memory/loop-state/${taskId}.json — resume with the loop CLI after intervention.`,
+      ].join('\n'),
+    );
     return file;
   }
 
@@ -63,14 +73,34 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
     state.status = 'escalated';
     saveState(state);
     const handoff = writeHandoff(state, reason);
-    emit({ task_id: taskId, phase: 'build', event: 'escalated', agent_role: 'controller', result: 'escalated', detail: { reason, handoff, iterations: state.iteration } });
+    emit({
+      task_id: taskId,
+      phase: 'build',
+      event: 'escalated',
+      agent_role: 'controller',
+      result: 'escalated',
+      detail: { reason, handoff, iterations: state.iteration },
+    });
     return { status: 'escalated', reason, handoff, iterations: state.iteration };
   }
 
   async function runGate(state, name, feedbackSink) {
     const res = await gates[name]();
-    state.history.push({ iteration: state.iteration, step: state.lastStep, gate: name, pass: res.pass, detail: res.detail ?? null });
-    emit({ task_id: taskId, phase: 'build', event: 'gate_run', agent_role: 'controller', result: res.pass ? 'pass' : 'fail', detail: { gate: name, ...res } });
+    state.history.push({
+      iteration: state.iteration,
+      step: state.lastStep,
+      gate: name,
+      pass: res.pass,
+      detail: res.detail ?? null,
+    });
+    emit({
+      task_id: taskId,
+      phase: 'build',
+      event: 'gate_run',
+      agent_role: 'controller',
+      result: res.pass ? 'pass' : 'fail',
+      detail: { gate: name, ...res },
+    });
     if (!res.pass) {
       if (res.severity === 'critical') return { escalation: escalate(state, `critical failure in gate '${name}'`) };
       state.consecutive[name] = (state.consecutive[name] ?? 0) + 1;
@@ -92,7 +122,10 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
     try {
       const res = await executor({ role, step: stepName, task: state.task, feedback });
       emit({
-        task_id: taskId, phase: 'build', event: 'step_complete', agent_role: role,
+        task_id: taskId,
+        phase: 'build',
+        event: 'step_complete',
+        agent_role: role,
         model: res?.model ?? null,
         tokens_in: res?.tokens_in ?? null,
         tokens_out: res?.tokens_out ?? null,
@@ -108,7 +141,16 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
   }
 
   async function runBuildTask(task) {
-    const state = loadState() ?? { task, taskId, status: 'running', iteration: 0, consecutive: {}, history: [], lastStep: null, blockingGate: null };
+    const state = loadState() ?? {
+      task,
+      taskId,
+      status: 'running',
+      iteration: 0,
+      consecutive: {},
+      history: [],
+      lastStep: null,
+      blockingGate: null,
+    };
     state.status = 'running';
     const feedback = [];
     try {
@@ -136,7 +178,14 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
         state.status = 'green';
         state.blockingGate = null;
         saveState(state);
-        emit({ task_id: taskId, phase: 'build', event: 'task_green', agent_role: 'controller', result: 'pass', detail: { iterations: state.iteration } });
+        emit({
+          task_id: taskId,
+          phase: 'build',
+          event: 'task_green',
+          agent_role: 'controller',
+          result: 'pass',
+          detail: { iterations: state.iteration },
+        });
         return { status: 'green', iterations: state.iteration };
       }
       return escalate(state, `iteration cap (${caps.totalIterations}) reached`);

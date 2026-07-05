@@ -30,21 +30,33 @@ export function buildPrompt({ role, step, task, feedback }) {
     for (const f of feedback) lines.push(`- gate '${f.gate}': ${f.detail ?? 'failed'}`);
   }
   if (role === 'test-writer') {
-    lines.push('', 'Write the failing test(s) for the acceptance criteria only. Do not write implementation code. The test must fail for the right reason.');
+    lines.push(
+      '',
+      'Write the failing test(s) for the acceptance criteria only. Do not write implementation code. The test must fail for the right reason.',
+    );
   } else {
-    lines.push('', 'Implement the minimum change to make the failing test pass. Do not modify tests; if a test looks wrong, write your case to memory/test-requests.md and stop.');
+    lines.push(
+      '',
+      'Implement the minimum change to make the failing test pass. Do not modify tests; if a test looks wrong, write your case to memory/test-requests.md and stop.',
+    );
   }
   return lines.filter((l) => l !== null).join('\n');
 }
 
 export function buildArgs({ role, prompt, cwd }) {
   return [
-    '-p', prompt,
-    '--model', ROLE_MODELS[role] ?? ROLE_MODELS.builder,
-    '--permission-mode', 'acceptEdits',
-    '--output-format', 'json',
-    '--max-turns', '25',
-    '--add-dir', cwd,
+    '-p',
+    prompt,
+    '--model',
+    ROLE_MODELS[role] ?? ROLE_MODELS.builder,
+    '--permission-mode',
+    'acceptEdits',
+    '--output-format',
+    'json',
+    '--max-turns',
+    '25',
+    '--add-dir',
+    cwd,
   ];
 }
 
@@ -52,13 +64,20 @@ export function buildArgs({ role, prompt, cwd }) {
 // The CLI reports total_cost_usd and usage itself — authoritative, nothing hardcoded.
 export function parseResult(out, role) {
   let parsed;
-  try { parsed = JSON.parse(out); } catch { return { summary: out, model: ROLE_MODELS[role] ?? null }; }
+  try {
+    parsed = JSON.parse(out);
+  } catch {
+    return { summary: out, model: ROLE_MODELS[role] ?? null };
+  }
   return {
     summary: parsed.result ?? out,
     model: ROLE_MODELS[role] ?? null,
     // input_tokens alone understates volume when caching dominates (live-verified:
     // a call with tokens_in=2 cost $0.12 via cache creation) — count cache tokens in.
-    tokens_in: (parsed.usage?.input_tokens ?? 0) + (parsed.usage?.cache_creation_input_tokens ?? 0) + (parsed.usage?.cache_read_input_tokens ?? 0) || null,
+    tokens_in:
+      (parsed.usage?.input_tokens ?? 0) +
+        (parsed.usage?.cache_creation_input_tokens ?? 0) +
+        (parsed.usage?.cache_read_input_tokens ?? 0) || null,
     tokens_out: parsed.usage?.output_tokens ?? null,
     cost_usd: parsed.total_cost_usd ?? null,
     duration_ms: parsed.duration_ms ?? null,
@@ -72,8 +91,12 @@ export function createClaudeExecutor({ cwd, spawnFn = spawn, timeoutMs = 15 * 60
     const args = buildArgs({ role, prompt, cwd });
     return await new Promise((resolve, reject) => {
       const child = spawnFn('claude', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
-      let out = '', err = '';
-      const timer = setTimeout(() => { child.kill('SIGTERM'); reject(new Error(`executor timeout after ${timeoutMs}ms`)); }, timeoutMs);
+      let out = '',
+        err = '';
+      const timer = setTimeout(() => {
+        child.kill('SIGTERM');
+        reject(new Error(`executor timeout after ${timeoutMs}ms`));
+      }, timeoutMs);
       child.stdout.on('data', (d) => (out += d));
       child.stderr.on('data', (d) => (err += d));
       child.on('close', (code) => {
@@ -81,7 +104,10 @@ export function createClaudeExecutor({ cwd, spawnFn = spawn, timeoutMs = 15 * 60
         if (code !== 0) return reject(new Error(`claude exited ${code}: ${err.slice(0, 500)}`));
         resolve(parseResult(out, role));
       });
-      child.on('error', (e) => { clearTimeout(timer); reject(e); });
+      child.on('error', (e) => {
+        clearTimeout(timer);
+        reject(e);
+      });
     });
   };
 }

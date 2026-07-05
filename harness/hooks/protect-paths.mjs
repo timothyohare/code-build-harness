@@ -46,26 +46,47 @@ const file = input.tool_input?.file_path || input.tool_input?.notebook_path || '
 const rel = path.relative(input.cwd || process.cwd(), file);
 
 let role = 'human';
-try { role = fs.readFileSync(path.join(input.cwd, '.harness-role'), 'utf8').trim(); } catch {}
+try {
+  role = fs.readFileSync(path.join(input.cwd, '.harness-role'), 'utf8').trim();
+} catch {}
 if (role === 'human') process.exit(0); // no active loop → normal interactive session
 
 function block(rule, redirect) {
-  emit({ phase: 'build', event: 'guardrail_block', agent_role: role, result: 'blocked',
-    detail: { rule, path: rel, tool } });
+  emit({
+    phase: 'build',
+    event: 'guardrail_block',
+    agent_role: role,
+    result: 'blocked',
+    detail: { rule, path: rel, tool },
+  });
   console.error(`BLOCKED (${rule}): role '${role}' may not modify: ${rel}. ${redirect}`);
   process.exit(2);
 }
 
 if (NEVER.some((re) => re.test(rel)))
-  block('never-tier', 'This path is human-only (workflows/harness/hook config). If a change is genuinely needed, write the request and rationale to memory/escalations.md and halt.');
+  block(
+    'never-tier',
+    'This path is human-only (workflows/harness/hook config). If a change is genuinely needed, write the request and rationale to memory/escalations.md and halt.',
+  );
 
 if (role !== 'test-writer' && TEST_OWNED.some((re) => re.test(rel)))
-  block('test-ownership', 'Tests are owned by the test-writer agent; record the needed test change in memory/test-requests.md instead.');
+  block(
+    'test-ownership',
+    'Tests are owned by the test-writer agent; record the needed test change in memory/test-requests.md instead.',
+  );
 
-if (role === 'test-writer' && !TEST_OWNED.some((re) => re.test(rel)) && !/(^|\/)memory\//.test(rel) && !/(^|\/)openspec\//.test(rel))
+if (
+  role === 'test-writer' &&
+  !TEST_OWNED.some((re) => re.test(rel)) &&
+  !/(^|\/)memory\//.test(rel) &&
+  !/(^|\/)openspec\//.test(rel)
+)
   block('test-writer-scope', 'The test-writer role only modifies test-owned paths, memory/, and the change bundle.');
 
 if (ASK_FIRST.some((re) => re.test(rel)))
-  block('ask-first-tier', 'Shared config requires human approval. Write the proposed change and rationale to memory/escalations.md and halt.');
+  block(
+    'ask-first-tier',
+    'Shared config requires human approval. Write the proposed change and rationale to memory/escalations.md and halt.',
+  );
 
 process.exit(0);

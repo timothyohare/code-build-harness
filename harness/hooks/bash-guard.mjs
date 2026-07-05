@@ -25,13 +25,22 @@ if (input.tool_name !== 'Bash') process.exit(0);
 const cmd = input.tool_input?.command || '';
 
 let role = 'human';
-try { role = fs.readFileSync(path.join(input.cwd, '.harness-role'), 'utf8').trim(); } catch {}
+try {
+  role = fs.readFileSync(path.join(input.cwd, '.harness-role'), 'utf8').trim();
+} catch {}
 if (role === 'human') process.exit(0);
 
 function block(rule) {
-  emit({ phase: 'build', event: 'guardrail_block', agent_role: role, result: 'blocked',
-    detail: { rule, command: cmd.slice(0, 200), tool: 'Bash' } });
-  console.error(`BLOCKED (${rule}): this command is not permitted for role '${role}'. If genuinely required, write the request to memory/escalations.md and halt.`);
+  emit({
+    phase: 'build',
+    event: 'guardrail_block',
+    agent_role: role,
+    result: 'blocked',
+    detail: { rule, command: cmd.slice(0, 200), tool: 'Bash' },
+  });
+  console.error(
+    `BLOCKED (${rule}): this command is not permitted for role '${role}'. If genuinely required, write the request to memory/escalations.md and halt.`,
+  );
   process.exit(2);
 }
 
