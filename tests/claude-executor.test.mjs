@@ -37,6 +37,15 @@ test('args: model routing per role (D-14), headless flags present', () => {
   }
 });
 
+test('args: builder gets scoped Bash(npm test) only; test-writer gets none (D-24)', () => {
+  const builder = buildArgs({ role: 'builder', prompt: 'x', cwd: '/repo' });
+  const i = builder.indexOf('--allowedTools');
+  assert.notEqual(i, -1, 'builder must have --allowedTools');
+  assert.deepEqual(builder.slice(i + 1), ['Bash(npm test)', 'Bash(npm test:*)']);
+  const tw = buildArgs({ role: 'test-writer', prompt: 'x', cwd: '/repo' });
+  assert.ok(!tw.includes('--allowedTools'), 'test-writer must not get shell access');
+});
+
 test('executor: parses JSON result, rejects on non-zero exit', async () => {
   function fakeSpawn(ok) {
     return () => {
