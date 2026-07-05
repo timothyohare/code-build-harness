@@ -1,12 +1,12 @@
 #!/usr/bin/env node
+import { execSync } from 'node:child_process';
 // First supervised live loop run (M1 milestone). Drives the two-agent TDD cycle
 // with real `claude -p` sub-agents and real gates against this repo.
 // Watch progress: tail -f metrics/events/$(date +%Y-%m).jsonl
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
-import { createLoop } from '../controller/loop.mjs';
 import { createClaudeExecutor } from '../controller/executors/claude-cli.mjs';
+import { createLoop } from '../controller/loop.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -25,7 +25,10 @@ const gates = {
   red: async () => {
     const r = sh('npm test');
     return r.pass
-      ? { pass: false, detail: 'expected the new test to FAIL, but the whole suite is green — the test does not test anything new' }
+      ? {
+          pass: false,
+          detail: 'expected the new test to FAIL, but the whole suite is green — the test does not test anything new',
+        }
       : { pass: true, detail: 'suite red as expected' };
   },
   green: async () => sh('npm test'),

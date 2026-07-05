@@ -1,7 +1,13 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
-import { buildPrompt, buildArgs, createClaudeExecutor, parseResult, ROLE_MODELS } from '../harness/controller/executors/claude-cli.mjs';
+import { test } from 'node:test';
+import {
+  buildArgs,
+  buildPrompt,
+  createClaudeExecutor,
+  parseResult,
+  ROLE_MODELS,
+} from '../harness/controller/executors/claude-cli.mjs';
 
 const TASK = { name: 'demo', description: 'a demo task', acceptance: 'exit 0' };
 
@@ -14,7 +20,12 @@ test('prompt: test-writer told tests-only, builder told no-test-edits', () => {
 });
 
 test('prompt: gate feedback is included on retries', () => {
-  const p = buildPrompt({ role: 'builder', step: 'implement', task: TASK, feedback: [{ gate: 'green', detail: '2 tests failing' }] });
+  const p = buildPrompt({
+    role: 'builder',
+    step: 'implement',
+    task: TASK,
+    feedback: [{ gate: 'green', detail: '2 tests failing' }],
+  });
   assert.match(p, /gate 'green': 2 tests failing/);
 });
 
@@ -46,7 +57,10 @@ test('executor: parses JSON result, rejects on non-zero exit', async () => {
   assert.equal(res.summary, 'did the thing');
 
   const bad = createClaudeExecutor({ cwd: '/repo', spawnFn: fakeSpawn(false) });
-  await assert.rejects(() => bad({ role: 'builder', step: 'implement', task: TASK, feedback: [] }), /claude exited 1: kaboom/);
+  await assert.rejects(
+    () => bad({ role: 'builder', step: 'implement', task: TASK, feedback: [] }),
+    /claude exited 1: kaboom/,
+  );
 });
 
 test('parseResult: captures usage, cost, duration, turns from CLI JSON', () => {

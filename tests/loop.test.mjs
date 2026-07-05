@@ -1,8 +1,8 @@
-import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { beforeEach, test } from 'node:test';
 import { createLoop, DEFAULT_CAPS } from '../harness/controller/loop.mjs';
 
 // All state in a temp root; events captured in-memory (no JSONL side effects).
@@ -34,7 +34,9 @@ const PASS = { pass: true };
 const FAIL = { pass: false, detail: 'boom' };
 
 test('happy path: red→green→ci on first iteration', async () => {
-  const loop = makeLoop({ gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) } });
+  const loop = makeLoop({
+    gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) },
+  });
   const res = await loop.runBuildTask({ name: 'demo' });
   assert.equal(res.status, 'green');
   assert.equal(res.iterations, 1);
@@ -49,14 +51,23 @@ test('role file is set per step: test-writer then builder', async () => {
     rolesSeen.push([role, fs.readFileSync(path.join(root, '.harness-role'), 'utf8')]);
     return {};
   };
-  const loop = makeLoop({ executor, gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) } });
+  const loop = makeLoop({
+    executor,
+    gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) },
+  });
   await loop.runBuildTask({ name: 'demo' });
-  assert.deepEqual(rolesSeen, [['test-writer', 'test-writer'], ['builder', 'builder']]);
+  assert.deepEqual(rolesSeen, [
+    ['test-writer', 'test-writer'],
+    ['builder', 'builder'],
+  ]);
 });
 
 test('gate failure feeds back to the executor next attempt', async () => {
   const feedbackSeen = [];
-  const executor = async ({ step, feedback }) => { feedbackSeen.push([step, feedback]); return {}; };
+  const executor = async ({ step, feedback }) => {
+    feedbackSeen.push([step, feedback]);
+    return {};
+  };
   const loop = makeLoop({
     executor,
     gates: { red: scriptedGate([PASS]), green: scriptedGate([FAIL, PASS]), ci: scriptedGate([PASS]) },
@@ -71,7 +82,9 @@ test('gate failure feeds back to the executor next attempt', async () => {
 });
 
 test('3 consecutive reds on one gate escalates with handoff note', async () => {
-  const loop = makeLoop({ gates: { red: scriptedGate([FAIL]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) } });
+  const loop = makeLoop({
+    gates: { red: scriptedGate([FAIL]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) },
+  });
   const res = await loop.runBuildTask({ name: 'demo' });
   assert.equal(res.status, 'escalated');
   assert.match(res.reason, /3 consecutive reds on gate 'red'/);
@@ -97,7 +110,11 @@ test('total-iteration cap escalates even when gates alternate', async () => {
 
 test('critical gate failure escalates immediately (zero-retry)', async () => {
   const loop = makeLoop({
-    gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([{ pass: false, severity: 'critical', detail: 'secret leaked' }]) },
+    gates: {
+      red: scriptedGate([PASS]),
+      green: scriptedGate([PASS]),
+      ci: scriptedGate([{ pass: false, severity: 'critical', detail: 'secret leaked' }]),
+    },
   });
   const res = await loop.runBuildTask({ name: 'demo' });
   assert.equal(res.status, 'escalated');
@@ -106,13 +123,17 @@ test('critical gate failure escalates immediately (zero-retry)', async () => {
 });
 
 test('state is persisted and resumable after escalation', async () => {
-  const loop = makeLoop({ gates: { red: scriptedGate([FAIL]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) } });
+  const loop = makeLoop({
+    gates: { red: scriptedGate([FAIL]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) },
+  });
   await loop.runBuildTask({ name: 'demo' });
   const state = JSON.parse(fs.readFileSync(path.join(root, 'memory', 'loop-state', 'T-1.json'), 'utf8'));
   assert.equal(state.status, 'escalated');
   assert.equal(state.history.length, 3);
   // a fresh loop over the same root resumes from saved state (iteration count carries)
-  const resumed = makeLoop({ gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) } });
+  const resumed = makeLoop({
+    gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) },
+  });
   const res = await resumed.runBuildTask({ name: 'demo' });
   assert.equal(res.status, 'green');
   assert.equal(res.iterations, 4, 'resumes at iteration 3+1, not 1');
@@ -124,9 +145,18 @@ test('DEFAULT_CAPS match D-11', () => {
 
 test('step_complete events carry executor telemetry (tokens, cost, model)', async () => {
   const executor = async ({ role }) => ({
-    summary: 'ok', model: `model-for-${role}`, tokens_in: 100, tokens_out: 20, cost_usd: 0.01, duration_ms: 5000, num_turns: 3,
+    summary: 'ok',
+    model: `model-for-${role}`,
+    tokens_in: 100,
+    tokens_out: 20,
+    cost_usd: 0.01,
+    duration_ms: 5000,
+    num_turns: 3,
   });
-  const loop = makeLoop({ executor, gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) } });
+  const loop = makeLoop({
+    executor,
+    gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) },
+  });
   await loop.runBuildTask({ name: 'demo' });
   const completes = events.filter((e) => e.event === 'step_complete');
   assert.equal(completes.length, 2);

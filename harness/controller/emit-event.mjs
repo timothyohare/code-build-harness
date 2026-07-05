@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { randomUUID } from 'node:crypto';
 // JSONL event emitter — the schema in docs/harness/metrics.md (D-12).
 // Usable as a library (import { emit }) or CLI:
 //   node emit-event.mjs --phase build --event gate_run --task-id CHG-1 \
@@ -6,7 +7,6 @@
 // Events append to metrics/events/YYYY-MM.jsonl at the repo root.
 import fs from 'node:fs';
 import path from 'node:path';
-import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -52,7 +52,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
     fields[key] = val;
   }
   if (!fields.event) {
-    console.error('usage: emit-event.mjs --event <name> [--phase p] [--task-id id] [--agent-role r] [--result pass|fail|blocked|escalated] [--detail json] ...');
+    console.error(
+      'usage: emit-event.mjs --event <name> [--phase p] [--task-id id] [--agent-role r] [--result pass|fail|blocked|escalated] [--detail json] ...',
+    );
     process.exit(1);
   }
   const e = emit(fields);

@@ -1,5 +1,5 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import { costUsd } from '../src/cost.mjs';
 
 test('costUsd charges input-only usage at the pricing rate', () => {
