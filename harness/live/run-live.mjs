@@ -32,7 +32,9 @@ const gates = {
       : { pass: true, detail: 'suite red as expected' };
   },
   green: async () => sh('npm test'),
-  ci: async () => sh('npm run lint && npm test'),
+  // M-parity step 3 (D-25): delegate to the ported gate-ci, which resolves this
+  // repo's binding (lint + test here) instead of hardcoding npm commands.
+  ci: async () => sh(`node ${path.join(ROOT, 'harness', 'gates', 'ci.mjs')} --force`),
 };
 
 const task = {
