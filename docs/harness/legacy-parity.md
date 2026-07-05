@@ -78,3 +78,21 @@ guard, labels) · review-chain design · OpenSpec change bundles · decisions re
    new paths.
 6. Only then: legacy `~/.claude/{bin,lib}` files replaced with forwarding shims (one
    release), then removed.
+
+## Cutover reference baselines (recorded 2026-07-05, legacy gate-ci --force)
+
+The ported gates must reproduce these verdicts on these repos before any retirement:
+
+| Repo | Binding profile exercised | Verdict |
+|---|---|---|
+| `~/dev/newdev/kickpool` | Next.js; full gate-perf surface (8 routes, perfEnv fixtures + MOCK_LLM, port 3100), dynamodb-local adapter, setup (`dynamo:init`), acceptance (`verify:persistence`), env block | ✅ exit 0 — lint + typecheck + 131 tests / 19 files |
+| `~/dev/newdev/nrl-predictor` | Python + Next frontend; compound lint/typecheck (ruff+mypy+frontend), mockUp/mockDown overrides (custom compose), custom gate scripts (`scripts/gate/*`), custom `perfBaseline` path, env block | ✅ exit 0 — ruff + mypy + frontend checks + 388 pytest tests |
+| `~/dev/newdev/aitutor` | pnpm monorepo; boot/ready/readyMatch, new test binding (vitest, 7 tests), mockUp/mockDown (compose postgres+redis) | ✅ lint 0 / typecheck 0 / tests 7-of-7 (2026-07-05, onboarding session) |
+
+Between them these three bindings exercise every `harness.json` key except
+`observability` (unbound everywhere so far — it no-ops; the extensions.md o11y gate
+will be its first real binding).
+
+New-harness rollout status per repo: **aitutor** has the role-aware TDD Guard hook +
+test binding (the template); **kickpool / nrl-predictor** stay legacy-bound until
+M-parity, then get the aitutor treatment (TDD Guard + role hooks) as needed.
