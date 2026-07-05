@@ -48,6 +48,24 @@ export function buildArgs({ role, prompt, cwd }) {
   ];
 }
 
+// Extract summary + usage/cost telemetry from `claude -p --output-format json`.
+// The CLI reports total_cost_usd and usage itself — authoritative, nothing hardcoded.
+export function parseResult(out, role) {
+  let parsed;
+  try { parsed = JSON.parse(out); } catch { return { summary: out, model: ROLE_MODELS[role] ?? null }; }
+  return {
+    summary: parsed.result ?? out,
+    model: ROLE_MODELS[role] ?? null,
+    // input_tokens alone understates volume when caching dominates (live-verified:
+    // a call with tokens_in=2 cost $0.12 via cache creation) — count cache tokens in.
+    tokens_in: (parsed.usage?.input_tokens ?? 0) + (parsed.usage?.cache_creation_input_tokens ?? 0) + (parsed.usage?.cache_read_input_tokens ?? 0) || null,
+    tokens_out: parsed.usage?.output_tokens ?? null,
+    cost_usd: parsed.total_cost_usd ?? null,
+    duration_ms: parsed.duration_ms ?? null,
+    num_turns: parsed.num_turns ?? null,
+  };
+}
+
 export function createClaudeExecutor({ cwd, spawnFn = spawn, timeoutMs = 15 * 60 * 1000 } = {}) {
   return async function execute({ role, step, task, feedback }) {
     const prompt = buildPrompt({ role, step, task, feedback });
@@ -61,9 +79,7 @@ export function createClaudeExecutor({ cwd, spawnFn = spawn, timeoutMs = 15 * 60
       child.on('close', (code) => {
         clearTimeout(timer);
         if (code !== 0) return reject(new Error(`claude exited ${code}: ${err.slice(0, 500)}`));
-        let summary = out;
-        try { summary = JSON.parse(out).result ?? out; } catch {}
-        resolve({ summary });
+        resolve(parseResult(out, role));
       });
       child.on('error', (e) => { clearTimeout(timer); reject(e); });
     });

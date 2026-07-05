@@ -121,3 +121,18 @@ test('state is persisted and resumable after escalation', async () => {
 test('DEFAULT_CAPS match D-11', () => {
   assert.deepEqual(DEFAULT_CAPS, { consecutiveGateReds: 3, totalIterations: 5 });
 });
+
+test('step_complete events carry executor telemetry (tokens, cost, model)', async () => {
+  const executor = async ({ role }) => ({
+    summary: 'ok', model: `model-for-${role}`, tokens_in: 100, tokens_out: 20, cost_usd: 0.01, duration_ms: 5000, num_turns: 3,
+  });
+  const loop = makeLoop({ executor, gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) } });
+  await loop.runBuildTask({ name: 'demo' });
+  const completes = events.filter((e) => e.event === 'step_complete');
+  assert.equal(completes.length, 2);
+  assert.equal(completes[0].model, 'model-for-test-writer');
+  assert.equal(completes[0].tokens_in, 100);
+  assert.equal(completes[0].cost_usd, 0.01);
+  assert.equal(completes[1].model, 'model-for-builder');
+  assert.equal(completes[1].detail.num_turns, 3);
+});

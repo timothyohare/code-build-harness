@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
-import { buildPrompt, buildArgs, createClaudeExecutor, ROLE_MODELS } from '../harness/controller/executors/claude-cli.mjs';
+import { buildPrompt, buildArgs, createClaudeExecutor, parseResult, ROLE_MODELS } from '../harness/controller/executors/claude-cli.mjs';
 
 const TASK = { name: 'demo', description: 'a demo task', acceptance: 'exit 0' };
 
@@ -47,4 +47,29 @@ test('executor: parses JSON result, rejects on non-zero exit', async () => {
 
   const bad = createClaudeExecutor({ cwd: '/repo', spawnFn: fakeSpawn(false) });
   await assert.rejects(() => bad({ role: 'builder', step: 'implement', task: TASK, feedback: [] }), /claude exited 1: kaboom/);
+});
+
+test('parseResult: captures usage, cost, duration, turns from CLI JSON', () => {
+  const out = JSON.stringify({
+    result: 'done',
+    usage: { input_tokens: 2000, cache_creation_input_tokens: 9000, cache_read_input_tokens: 1000, output_tokens: 800 },
+    total_cost_usd: 0.0734,
+    duration_ms: 45000,
+    num_turns: 6,
+  });
+  const r = parseResult(out, 'builder');
+  assert.equal(r.summary, 'done');
+  assert.equal(r.model, ROLE_MODELS.builder);
+  assert.equal(r.tokens_in, 12000, 'cache tokens counted into tokens_in');
+  assert.equal(r.tokens_out, 800);
+  assert.equal(r.cost_usd, 0.0734);
+  assert.equal(r.duration_ms, 45000);
+  assert.equal(r.num_turns, 6);
+});
+
+test('parseResult: non-JSON output degrades to raw summary with nulls', () => {
+  const r = parseResult('plain text output', 'test-writer');
+  assert.equal(r.summary, 'plain text output');
+  assert.equal(r.model, ROLE_MODELS['test-writer']);
+  assert.equal(r.tokens_in, undefined);
 });

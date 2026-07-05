@@ -90,7 +90,18 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
     state.lastStep = stepName;
     emit({ task_id: taskId, phase: 'build', event: 'task_step', agent_role: role, detail: { step: stepName } });
     try {
-      return await executor({ role, step: stepName, task: state.task, feedback });
+      const res = await executor({ role, step: stepName, task: state.task, feedback });
+      emit({
+        task_id: taskId, phase: 'build', event: 'step_complete', agent_role: role,
+        model: res?.model ?? null,
+        tokens_in: res?.tokens_in ?? null,
+        tokens_out: res?.tokens_out ?? null,
+        cost_usd: res?.cost_usd ?? null,
+        duration_ms: res?.duration_ms ?? null,
+        result: 'pass',
+        detail: { step: stepName, num_turns: res?.num_turns ?? null },
+      });
+      return res;
     } finally {
       clearRole();
     }
