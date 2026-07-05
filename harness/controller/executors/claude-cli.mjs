@@ -43,8 +43,15 @@ export function buildPrompt({ role, step, task, feedback }) {
   return lines.filter((l) => l !== null).join('\n');
 }
 
+// Scoped Bash per role (D-24): builders may run the test suite mid-flight for
+// faster inner-loop feedback; final verification stays with the controller's
+// gates. No other shell access — the bash-guard hook remains the backstop.
+export const ROLE_ALLOWED_TOOLS = {
+  builder: ['Bash(npm test)', 'Bash(npm test:*)'],
+};
+
 export function buildArgs({ role, prompt, cwd }) {
-  return [
+  const args = [
     '-p',
     prompt,
     '--model',
@@ -58,6 +65,9 @@ export function buildArgs({ role, prompt, cwd }) {
     '--add-dir',
     cwd,
   ];
+  const allowed = ROLE_ALLOWED_TOOLS[role];
+  if (allowed?.length) args.push('--allowedTools', ...allowed);
+  return args;
 }
 
 // Extract summary + usage/cost telemetry from `claude -p --output-format json`.

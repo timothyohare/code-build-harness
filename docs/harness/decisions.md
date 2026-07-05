@@ -60,6 +60,7 @@ New decisions from this ratification:
 | D-21 | Migration loops: agents write shims/backfill/parity checks; humans own mapping spec and cutover (cutover never graduates); rollback drill is a mandatory gate before any cutover | **Final** |
 | D-22 | Feature flags are harness-native with a mandatory lifecycle: every flag declared in a registry file with owner + expiry; a stale-flag gate fails CI when a flag passes its expiry; flag removal is a standing Simplify-phase task | **Final** |
 | D-23 | Observability: OTel instrumentation everywhere; personal backend AWS-native; enterprise adapters (Sumo Logic, Dynatrace) deferred until work constraints are known | **Final** |
+| D-24 | Builder agents get scoped `Bash(npm test)` (and only that) via `--allowedTools` for inner-loop feedback; authoritative verification remains the controller's gates; bash-guard hook stays as backstop (Tim, 2026-07-05, after first live run) | **Final** |
 
 | ID | Decision | Status | Rationale / evidence |
 |---|---|---|---|
