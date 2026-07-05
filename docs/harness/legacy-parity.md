@@ -10,6 +10,11 @@ Tim's repos (aitutor, kickpool, nrl-predictor). **This project replaces it** (Ti
 
 Status: ✅ present in new harness · 🔜 planned (milestone noted) · 🆕 new-harness improvement over legacy
 
+> **Update 2026-07-05 (CHG-0014…0018):** every 🔜 row below is now ✅ — ported
+> as-is into `harness/gates/` (`resolve.mjs` + `resolve-cli.mjs`, `ci.mjs`,
+> `verify.mjs`, `perf.mjs`), each gate emitting `validate.gate_run` JSONL events
+> (the 🆕 rows), with 33 new unit tests. See "M-parity execution record" below.
+
 ### Resolver (`lib/harness.mjs`)
 
 | Feature | Status |
@@ -96,3 +101,29 @@ will be its first real binding).
 New-harness rollout status per repo: **aitutor** has the role-aware TDD Guard hook +
 test binding (the template); **kickpool / nrl-predictor** stay legacy-bound until
 M-parity, then get the aitutor treatment (TDD Guard + role hooks) as needed.
+
+## M-parity execution record (2026-07-05, CHG-0014…0019)
+
+| Step | Status |
+|---|---|
+| 1. Resolver + CLI port with unit tests | ✅ CHG-0014 (PR #15) |
+| 2. Three gates ported, each with `validate.gate_run` telemetry + tests | ✅ CHG-0015/0016/0017 (PRs #16–18) |
+| 3. Loop `ci` gate delegates to ported gate-ci | ✅ CHG-0018 (PR #19) |
+| 4. Stop hook repointed | ✅ `~/.claude/settings.json` Stop → `node …/code-build-harness/harness/gates/ci.mjs` (absolute path). Pipe-tested: loop-guard payload exit 0; clean foreign repo exit 0. **Rollback**: revert that one line to `node /home/timohare/.claude/bin/gate-ci.mjs`. |
+| 5. Dual-run cutover checks | ✅ see below |
+| 6. Legacy shims → removal | ⏳ **open, human-gated** — legacy `~/.claude/{bin,lib}` left fully intact so step-4 rollback stays one line. Tim to approve shimming/removal after reviewing this record. |
+
+### Step-5 dual-run results (legacy path vs `harness/gates/` path, same repo, same binding)
+
+Resolver: `--json` output **byte-identical** on aitutor, kickpool, nrl-predictor.
+
+| Repo | gate-ci --force (old/new) | gate-verify (old/new) | Verdict |
+|---|---|---|---|
+| aitutor | 0 / 0 | 1 / 1 — both fail at "mock up failed" (compose postgres+redis; pre-existing env issue, not a port regression) | ✅ match |
+| kickpool | 0 / 0 | 0 / 0 — dynamodb-local up, boot, persistence acceptance, teardown | ✅ match |
+| nrl-predictor | 0 / 0 | 0 / 0 — custom compose overrides, Python + frontend boot, custom gate scripts | ✅ match |
+
+All verdicts reproduce the CHG-0012 reference baselines. gate-perf dual-run not
+required: no repo binds perf keys yet (kickpool's perf surface was exercised via
+its binding profile in CHG-0012; the ported gate's behavior is pinned by its 7
+unit tests including the no-op contract).
