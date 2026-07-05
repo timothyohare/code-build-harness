@@ -1,0 +1,40 @@
+{
+  "task": {
+    "name": "token-cost-calculator",
+    "description": "Create src/cost.mjs exporting a pure function costUsd(usage, pricing). usage: { model, tokens_in, tokens_out } (token counts may be null/undefined → treat as 0). pricing: map of model id → { in: USD per million input tokens, out: USD per million output tokens }. Returns the cost in USD as a number, or null when usage.model is absent from pricing. No hardcoded prices anywhere — pricing always comes from the caller.",
+    "acceptance": "costUsd({model:\"m1\",tokens_in:1_000_000,tokens_out:0}, {m1:{in:5,out:25}}) === 5\ncostUsd({model:\"m1\",tokens_in:500_000,tokens_out:200_000}, {m1:{in:5,out:25}}) === 7.5\ncostUsd({model:\"unknown\",tokens_in:10,tokens_out:10}, {m1:{in:5,out:25}}) === null\ncostUsd({model:\"m1\"}, {m1:{in:5,out:25}}) === 0 (missing token counts treated as 0)\nTest file lives at tests/cost.test.mjs using node:test."
+  },
+  "taskId": "CHG-0007",
+  "status": "green",
+  "iteration": 1,
+  "consecutive": {
+    "red": 0,
+    "green": 0,
+    "ci": 0
+  },
+  "history": [
+    {
+      "iteration": 1,
+      "step": "write-failing-test",
+      "gate": "red",
+      "pass": true,
+      "detail": "suite red as expected"
+    },
+    {
+      "iteration": 1,
+      "step": "implement",
+      "gate": "green",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "iteration": 1,
+      "step": "implement",
+      "gate": "ci",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "lastStep": "implement",
+  "blockingGate": null
+}
