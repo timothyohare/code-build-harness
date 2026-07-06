@@ -111,7 +111,7 @@ M-parity, then get the aitutor treatment (TDD Guard + role hooks) as needed.
 | 3. Loop `ci` gate delegates to ported gate-ci | ✅ CHG-0018 (PR #19) |
 | 4. Stop hook repointed | ✅ `~/.claude/settings.json` Stop → `node …/code-build-harness/harness/gates/ci.mjs` (absolute path). Pipe-tested: loop-guard payload exit 0; clean foreign repo exit 0. **Rollback**: revert that one line to `node /home/timohare/.claude/bin/gate-ci.mjs`. |
 | 5. Dual-run cutover checks | ✅ see below |
-| 6. Legacy shims → removal | ⏳ **open, human-gated** — legacy `~/.claude/{bin,lib}` left fully intact so step-4 rollback stays one line. Tim to approve shimming/removal after reviewing this record. |
+| 6. Legacy shims → removal | 🟡 **shims in place** (Tim approved 2026-07-06, CHG-0020). All five legacy files (`bin/gate-{ci,verify,perf}.mjs`, `bin/harness-resolve.mjs`, `lib/harness.mjs`) replaced with one-line forwarding shims (`await import(...)` / `export * from ...`) into `harness/gates/`. Verified: shimmed resolve CLI byte-identical `--json` on kickpool + exit-3 contract; shimmed lib import resolves; shimmed gate-ci runs the new gate with telemetry + loop guard; perf no-op and verify fail-fast paths exercised. Originals preserved at `~/.claude/bin/.legacy-originals-2026-07-06/`. Global `~/.claude/CLAUDE.md` gate paths updated to the new location. **Remaining**: after one release of quiet shims, delete the five shims + the backup dir. |
 
 ### Step-5 dual-run results (legacy path vs `harness/gates/` path, same repo, same binding)
 
