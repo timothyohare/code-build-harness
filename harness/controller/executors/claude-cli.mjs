@@ -29,7 +29,12 @@ export function buildPrompt({ role, step, task, feedback }) {
     lines.push('', 'Previous attempt failed these gates — address them:');
     for (const f of feedback) lines.push(`- gate '${f.gate}': ${f.detail ?? 'failed'}`);
   }
-  if (role === 'test-writer') {
+  if (role === 'test-writer' && step === 'strengthen-tests') {
+    lines.push(
+      '',
+      'The suite is green but too WEAK: the mutation-gate feedback above names surviving mutants (file:line, mutator, replacement). Strengthen or add assertions so those mutants are killed. The strengthened tests must PASS on the current implementation — do not write a deliberately failing test. Do not write implementation code, lower mutation thresholds, or add Stryker disable comments.',
+    );
+  } else if (role === 'test-writer') {
     lines.push(
       '',
       'Write the failing test(s) for the acceptance criteria only. Do not write implementation code. The test must fail for the right reason.',
