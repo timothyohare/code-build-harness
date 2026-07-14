@@ -35,6 +35,10 @@ const gates = {
   // M-parity step 3 (D-25): delegate to the ported gate-ci, which resolves this
   // repo's binding (lint + test here) instead of hardcoding npm commands.
   ci: async () => sh(`node ${path.join(ROOT, 'harness', 'gates', 'ci.mjs')} --force`),
+  // M2 survivor feedback: gate-mutation prints survivors on stderr; sh() keeps
+  // the tail, so a red's detail carries file:line/mutator into the next
+  // strengthen-tests prompt. Unbound repos no-op (exit 0 = pass).
+  mutation: async () => sh(`node ${path.join(ROOT, 'harness', 'gates', 'mutation.mjs')}`),
 };
 
 const task = {

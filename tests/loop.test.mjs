@@ -139,6 +139,73 @@ test('state is persisted and resumable after escalation', async () => {
   assert.equal(res.iterations, 4, 'resumes at iteration 3+1, not 1');
 });
 
+test('mutation red routes next iteration into strengthen mode: no red re-verification', async () => {
+  const stepsSeen = [];
+  const executor = async ({ step, feedback }) => {
+    stepsSeen.push([step, feedback]);
+    return {};
+  };
+  let redCalls = 0;
+  const loop = makeLoop({
+    executor,
+    gates: {
+      red: async () => {
+        redCalls++;
+        return PASS;
+      },
+      green: scriptedGate([PASS]),
+      ci: scriptedGate([PASS]),
+      mutation: scriptedGate([{ pass: false, detail: 'src/cost.mjs:14 ArithmeticOperator → "/"' }, PASS]),
+    },
+  });
+  const res = await loop.runBuildTask({ name: 'demo' });
+  assert.equal(res.status, 'green');
+  assert.equal(res.iterations, 2);
+  assert.equal(redCalls, 1, 'red must not re-run for a strengthening test');
+  assert.deepEqual(
+    stepsSeen.map(([s]) => s),
+    ['write-failing-test', 'implement', 'strengthen-tests'],
+  );
+  // the survivor detail reaches the strengthen step as gate feedback
+  assert.deepEqual(stepsSeen[2][1], [{ gate: 'mutation', detail: 'src/cost.mjs:14 ArithmeticOperator → "/"' }]);
+});
+
+test('strengthen mode is sticky: a green red keeps strengthening, never demands a failing test', async () => {
+  const stepsSeen = [];
+  const executor = async ({ step }) => {
+    stepsSeen.push(step);
+    return {};
+  };
+  const loop = makeLoop({
+    executor,
+    gates: {
+      red: scriptedGate([PASS]),
+      // iter 1 pass; iter 2 the strengthening test breaks the suite; iter 3 fixed
+      green: scriptedGate([PASS, FAIL, PASS]),
+      ci: scriptedGate([PASS]),
+      mutation: scriptedGate([FAIL, PASS]),
+    },
+  });
+  const res = await loop.runBuildTask({ name: 'demo' });
+  assert.equal(res.status, 'green');
+  assert.equal(res.iterations, 3);
+  assert.deepEqual(stepsSeen, ['write-failing-test', 'implement', 'strengthen-tests', 'strengthen-tests']);
+});
+
+test('3 consecutive mutation reds escalate like any other gate', async () => {
+  const loop = makeLoop({
+    gates: {
+      red: scriptedGate([PASS]),
+      green: scriptedGate([PASS]),
+      ci: scriptedGate([PASS]),
+      mutation: scriptedGate([FAIL]),
+    },
+  });
+  const res = await loop.runBuildTask({ name: 'demo' });
+  assert.equal(res.status, 'escalated');
+  assert.match(res.reason, /3 consecutive reds on gate 'mutation'/);
+});
+
 test('DEFAULT_CAPS match D-11', () => {
   assert.deepEqual(DEFAULT_CAPS, { consecutiveGateReds: 3, totalIterations: 5 });
 });

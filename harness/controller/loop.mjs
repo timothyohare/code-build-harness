@@ -10,8 +10,11 @@
 //
 // Dependencies are injected so the controller is testable without agents:
 //   executor: async ({ role, step, task, feedback }) => ({ summary })
-//   gates:    { red, green, ci } — each async () => ({ pass, detail?, severity? })
+//   gates:    { red, green, ci, mutation? } — each async () => ({ pass, detail?, severity? })
 //     `red` must PASS when the new test FAILS (verified-RED, not file presence).
+//     `mutation` (optional) runs after ci; a red flips the loop into sticky
+//     survivor-strengthening mode (test-writer only, no red verification)
+//     until mutation passes or the task escalates.
 //   emit:     event sink (defaults to the JSONL emitter).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -150,6 +153,7 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
       history: [],
       lastStep: null,
       blockingGate: null,
+      mode: null,
     };
     state.status = 'running';
     const feedback = [];
@@ -158,25 +162,50 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
         state.iteration += 1;
         saveState(state);
 
-        // 1. test-writer produces the failing test; RED must be verified by running it.
-        await step(state, 'test-writer', 'write-failing-test', feedback.splice(0));
-        const red = await runGate(state, 'red', feedback);
-        if (red.escalation) return red.escalation;
-        if (!red.pass) continue;
+        if (state.mode === 'strengthen') {
+          // Survivor-strengthening mode (M2): a mutation red means the suite is
+          // green but too WEAK — a test that kills a surviving mutant passes on
+          // the real implementation by design, so verified-RED must not run.
+          // The mode is sticky (even across a green/ci red on the strengthened
+          // test) until mutation passes or the task escalates: TDD is done at
+          // this point, so re-verifying RED would demand a wrong test.
+          await step(state, 'test-writer', 'strengthen-tests', feedback.splice(0));
+          const green = await runGate(state, 'green', feedback);
+          if (green.escalation) return green.escalation;
+          if (!green.pass) continue;
+        } else {
+          // 1. test-writer produces the failing test; RED must be verified by running it.
+          await step(state, 'test-writer', 'write-failing-test', feedback.splice(0));
+          const red = await runGate(state, 'red', feedback);
+          if (red.escalation) return red.escalation;
+          if (!red.pass) continue;
 
-        // 2. builder implements the minimum to pass; GREEN verified.
-        await step(state, 'builder', 'implement', feedback.splice(0));
-        const green = await runGate(state, 'green', feedback);
-        if (green.escalation) return green.escalation;
-        if (!green.pass) continue;
+          // 2. builder implements the minimum to pass; GREEN verified.
+          await step(state, 'builder', 'implement', feedback.splice(0));
+          const green = await runGate(state, 'green', feedback);
+          if (green.escalation) return green.escalation;
+          if (!green.pass) continue;
+        }
 
         // 3. full fast gate (lint + typecheck + tests + arch rules).
         const ci = await runGate(state, 'ci', feedback);
         if (ci.escalation) return ci.escalation;
         if (!ci.pass) continue;
 
+        // 4. mutation gate (optional — M2 "grade the graders"): a red here flips
+        // the loop into survivor-strengthening mode above.
+        if (gates.mutation) {
+          const mu = await runGate(state, 'mutation', feedback);
+          if (mu.escalation) return mu.escalation;
+          if (!mu.pass) {
+            state.mode = 'strengthen';
+            continue;
+          }
+        }
+
         state.status = 'green';
         state.blockingGate = null;
+        state.mode = null;
         saveState(state);
         emit({
           task_id: taskId,

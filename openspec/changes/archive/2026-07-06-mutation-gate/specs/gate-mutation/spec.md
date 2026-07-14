@@ -28,10 +28,10 @@ change the verdict.
 
 ### Requirement: Survivor feedback
 
-When the JSON report (path `mutationReport`, default
-`reports/mutation/mutation.json`) contains Survived or NoCoverage mutants, the
-gate SHALL print each survivor's file, line, mutator, and replacement (capped
-at 20), and instruct strengthening tests rather than lowering the threshold.
+The gate SHALL print each survivor's file, line, mutator, and replacement
+(capped at 20) whenever the JSON report (path `mutationReport`, default
+`reports/mutation/mutation.json`) contains Survived or NoCoverage mutants, and
+MUST instruct strengthening tests rather than lowering the threshold.
 
 #### Scenario: Red run names the survivor
 

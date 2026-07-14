@@ -19,6 +19,19 @@ test('prompt: test-writer told tests-only, builder told no-test-edits', () => {
   assert.match(b, /memory\/test-requests\.md/);
 });
 
+test('prompt: strengthen-tests tells test-writer the tests must PASS, not fail', () => {
+  const p = buildPrompt({
+    role: 'test-writer',
+    step: 'strengthen-tests',
+    task: TASK,
+    feedback: [{ gate: 'mutation', detail: 'src/cost.mjs:14 ArithmeticOperator → "/"' }],
+  });
+  assert.match(p, /must PASS on the current implementation/);
+  assert.match(p, /Do not write implementation code/);
+  assert.doesNotMatch(p, /must fail for the right reason/);
+  assert.match(p, /gate 'mutation': src\/cost\.mjs:14/);
+});
+
 test('prompt: gate feedback is included on retries', () => {
   const p = buildPrompt({
     role: 'builder',
