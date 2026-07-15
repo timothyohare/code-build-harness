@@ -1,0 +1,59 @@
+# Reusable per-PR security scanning (CHG-0024, spec: security-scanning).
+# Single source for the three scanner jobs — consumer repos run these via a
+# thin caller workflow (uses: timothyohare/code-build-harness/.github/
+# workflows/security-reusable.yml@main); this repo's security.yml is the
+# same-repo caller. Suppressions are inline and reviewed (nosemgrep /
+# .gitleaksignore / .trivyignore) — never threshold cuts.
+name: security-reusable
+
+on:
+  workflow_call:
+    inputs:
+      include-dev-deps:
+        description: >-
+          Include npm devDependencies in the Trivy vulnerability scan. Enable
+          for repos whose dependencies are all devDeps that run in CI.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Semgrep (SAST, registry auto config, red on any finding)
+        run: semgrep scan --config auto --error
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks (secrets, full history)
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Use .trivyignore.yaml if the repo has one
+        # Trivy only auto-detects the plain .trivyignore format, which cannot
+        # scope suppressions to a path — the yaml variant can, but must be
+        # passed explicitly.
+        run: '[ -f .trivyignore.yaml ] && echo "TRIVY_IGNOREFILE=.trivyignore.yaml" >> "$GITHUB_ENV" || true'
+      - name: Trivy (deps + secrets + misconfig, HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_INCLUDE_DEV_DEPS: ${{ inputs.include-dev-deps }}
+        with:
+          scan-type: fs
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          ignore-unfixed: true

@@ -1,9 +1,9 @@
-# Per-PR security scanning (CHG-0023, spec: security-scanning). Three
-# independent jobs so each scanner class gives its own pass/fail signal.
-# Suppressions are inline and reviewed (nosemgrep / .gitleaksignore /
-# .trivyignore) — never threshold cuts. Same integrity note as ci.yml: the
-# guard workflow fails any PR touching .github/** without the
-# harness-config-approved label.
+# Per-PR security scanning (CHG-0023/CHG-0024, spec: security-scanning).
+# Thin caller of the reusable workflow — the same code path consumer repos
+# use, so this repo dogfoods it. Check contexts are nested:
+# "security / semgrep|gitleaks|trivy" (required in the main-protection
+# ruleset). Same integrity note as ci.yml: the guard workflow fails any PR
+# touching .github/** without the harness-config-approved label.
 name: security
 
 on:
@@ -14,37 +14,9 @@ permissions:
   contents: read
 
 jobs:
-  semgrep:
-    runs-on: ubuntu-latest
-    container:
-      image: semgrep/semgrep
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - name: Semgrep (SAST, registry auto config, red on any finding)
-        run: semgrep scan --config auto --error
-  gitleaks:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          fetch-depth: 0
-      - name: Gitleaks (secrets, full history)
-        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  trivy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - name: Trivy (deps + secrets + misconfig, HIGH/CRITICAL)
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        env:
-          # This repo's deps are all devDependencies and they run in CI —
-          # without this the npm vuln scan sees zero packages.
-          TRIVY_INCLUDE_DEV_DEPS: "true"
-        with:
-          scan-type: fs
-          scanners: vuln,secret,misconfig
-          severity: HIGH,CRITICAL
-          exit-code: 1
-          ignore-unfixed: true
+  security:
+    uses: ./.github/workflows/security-reusable.yml
+    with:
+      # This repo's deps are all devDependencies and they run in CI —
+      # without this the npm vuln scan sees zero packages.
+      include-dev-deps: true
