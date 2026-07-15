@@ -43,13 +43,12 @@ is unproven. Schema-driven fuzzing makes that an executable claim.
 - nrl-predictor: new `openapi.yaml` for the gate API + binding keys.
 - Runtime: schemathesis via `uv tool run` / pipx / docker (decide in design).
 
-## Open questions for review
+## Ratified decisions (Tim, 2026-07-15: "go with your recommendations")
 
-1. Schemathesis invocation: docker image (matches scanner pattern, no
-   Python-env coupling) vs repo venv install (faster, but per-repo setup).
-   Recommend docker.
-2. Nightly scheduled run in CI now, or local/on-demand only until the gate
-   proves quiet? Recommend on-demand first (same maturation path as
-   gate-perf).
-3. Dedicated `CHG` for writing nrl-predictor's OpenAPI document, or fold it
-   into this one? (It is the pilot's precondition either way.)
+1. Schemathesis via **docker image** — matches the scanner pattern, no
+   Python-env coupling.
+2. **On-demand first**; nightly scheduled run only after the gate proves
+   quiet (same maturation path as gate-perf).
+3. nrl-predictor's OpenAPI document is **task 1.1 of this change** — the
+   pilot's precondition, and it doubles as the contract of record for the
+   CHG-0025 acceptance scenarios.
