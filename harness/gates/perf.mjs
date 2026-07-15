@@ -137,6 +137,7 @@ async function main() {
   log(`▶ perf boot: ${boot}`);
   const logFile = join(mkdtempSync(join(tmpdir(), 'gate-perf-')), 'boot.log');
   const fd = openSync(logFile, 'a');
+  // nosemgrep: javascript.lang.security.audit.spawn-shell-true.spawn-shell-true -- perfBoot is a shell command string from the repo's committed harness.json (same trust boundary as an npm script), not user input
   server = spawn(boot, { cwd: root, shell: true, detached: true, stdio: ['ignore', fd, fd], env });
 
   log(`▶ waiting for ${ready} ...`);

@@ -129,6 +129,7 @@ if (!config.boot || !config.ready) fail('boot/ready not configured for this proj
 const logFile = join(mkdtempSync(join(tmpdir(), 'gate-verify-')), 'boot.log');
 const fd = openSync(logFile, 'a');
 log(`▶ boot: ${config.boot}   (logs: ${logFile})`);
+// nosemgrep: javascript.lang.security.audit.spawn-shell-true.spawn-shell-true -- boot is a shell command string from the repo's committed harness.json (same trust boundary as an npm script), not user input
 boot = spawn(config.boot, { cwd: root, shell: true, detached: true, stdio: ['ignore', fd, fd], env });
 
 // 3. Readiness
