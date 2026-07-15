@@ -14,6 +14,8 @@
 - [x] 1.4 Harness docs: behavioural acceptance pattern + per-stack framework
       policy (pytest-bdd / cucumber-js / Karate-for-Java) in
       docs/harness/phases/04-validate.md
-- [ ] 1.5 PRs (nrl-predictor pilot; this repo bundle+docs); merge; archive.
+- [x] 1.5 PRs (nrl-predictor pilot; this repo bundle+docs); merge; archive.
       Follow-up recorded: retire acceptance.py after a quiet parity period;
-      cucumber-js pattern lands with the first JS repo adoption
+      cucumber-js pattern lands with the first JS repo adoption.
+      (nrl-predictor#11 merged 1dd5dee; harness#29 merged 8cc7cb5; archived
+      2026-07-15.)
