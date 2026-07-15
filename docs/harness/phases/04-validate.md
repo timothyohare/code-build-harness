@@ -19,6 +19,7 @@ Build phase exit: all tasks green, `gate-ci --full` exit 0.
 | 4. **Mutation testing** (diff-scoped) | StrykerJS `--incremental` (TS) / mutmut (Py) on changed lines | CI, per PR | Yes, break < 80% on changed code |
 | 5. Security fast pass | Semgrep (diff) + Gitleaks + Trivy | CI, per PR | Yes on high/critical |
 | 6. Perf check | `gate-perf` p50 vs committed baseline | On-demand / suspected regression | Soft |
+| 6b. API fuzz | `gate-fuzz`: Schemathesis vs the repo's OpenAPI doc (`fuzzSchema` binding) over the deterministic boot; reds on 5xx / schema violations | On-demand when touching API surface; nightly once stable | Soft (CHG-0026) |
 | 7. Mutation full run | Whole-codebase score | Nightly | Informational + retro feed |
 | 8. Security deep pass | CodeQL, ZAP baseline→active, Nuclei, Schemathesis, TruffleHog verified, nmap expected-ports diff | Nightly vs ephemeral staging | Findings triaged next morning |
 
