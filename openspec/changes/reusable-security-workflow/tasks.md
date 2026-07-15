@@ -8,13 +8,15 @@
       (.github/** protected); read the actual nested check contexts off the
       PR run, update `main-protection` required checks
       (`semgrep`→`security / semgrep` etc.), merge.
-- [ ] 1.3 nrl-predictor triage (pre-scanned 2026-07-15): SHA-pin
+- [x] 1.3 nrl-predictor triage (pre-scanned 2026-07-15): SHA-pin
       `ci.yml` actions (fixes 2 semgrep mutable-tag findings); inline
       `# nosemgrep` on `fetcher-spikes/run_spikes.py:29` (intentional
       dynamic import) and `scripts/gate/acceptance.py:20` (intentional
       dynamic urllib); `.gitleaksignore` with the 20 fingerprints for
       CloudFormation asset hashes in `tasks/baseline/v{1,2}.template.json`
-      @ 5fa28ada. Local proof: all three scanners exit 0 via docker
+      @ 5fa28ada; `.trivyignore.yaml` path-scoped AWS-0095/AWS-0132 on the
+      retired v1 baseline template (2 real HIGHs, historical snapshot only —
+      v2 clean). Local proof: all three scanners exit 0 via docker
       (trivy with `--skip-dirs .venv,infra/cdk.out` — untracked local dirs).
 - [ ] 1.4 nrl-predictor caller `.github/workflows/security.yml`
       (`uses: timothyohare/code-build-harness/.github/workflows/security-reusable.yml@main`);
