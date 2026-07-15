@@ -16,5 +16,6 @@
       catch-all). Post-fix: 74/74 generated cases pass, seed 42
 - [x] 1.4 Docs: validation-stack table row (04-validate.md) + gate roster
       entry and fuzz binding keys in ~/.claude/CLAUDE.md
-- [ ] 1.5 PR(s); merge; archive bundle. Follow-up recorded: nightly
-      scheduled run once quiet
+- [x] 1.5 PR(s); merge; archive bundle. Follow-up recorded: nightly
+      scheduled run once quiet. (nrl#12 merged 0bc08ab; harness#31 merged
+      e95e89b with tests-approved; archived 2026-07-15.)
