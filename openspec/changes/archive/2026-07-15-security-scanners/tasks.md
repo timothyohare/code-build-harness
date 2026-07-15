@@ -10,9 +10,12 @@
       (actionlint 0; semgrep 0 findings after 2 reviewed nosemgrep
       suppressions on harness.json boot spawns; gitleaks 48 commits clean;
       trivy 0 HIGH/CRITICAL)
-- [ ] 1.3 PR (carries legacy-shims bundle archive move); `harness-config-approved`
+- [x] 1.3 PR (carries legacy-shims bundle archive move); `harness-config-approved`
       label from Tim (.github/** is protected); all three scanner checks
-      green on the PR itself — the PR is the live drill
-- [ ] 1.4 Follow-up recorded: Tim adds the three checks to the branch
-      ruleset's required checks once stable
-- [ ] 1.5 Merge; archive bundle
+      green on the PR itself — the PR is the live drill (PR #25: semgrep,
+      gitleaks, trivy all green; guard green after label)
+- [x] 1.4 Follow-up recorded: Tim adds the three checks to the branch
+      ruleset's required checks once stable (done 2026-07-15: semgrep,
+      gitleaks, trivy added to main-protection ruleset required checks)
+- [x] 1.5 Merge; archive bundle (merged as dd3769f, PR #25; archived
+      2026-07-15)
