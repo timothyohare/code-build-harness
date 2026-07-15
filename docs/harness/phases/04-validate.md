@@ -51,6 +51,21 @@ validate the running system. Two additions over time:
 - **Seeded-fault drills** (periodic, not per-PR): inject a known bug, confirm the
   stack catches it. Answers "gates never fire — good code or blind sensors?"
 
+## Behavioural (BDD) acceptance suites (CHG-0025)
+
+The `acceptance` binding should point at a behavioural suite where the repo has
+an HTTP API: scenarios in version-controlled feature files (given/when/then over
+requests and responses), so the covered behaviours are readable in a diff without
+running anything, and a failing scenario reds the gate by name.
+
+Framework policy (ratified 2026-07-15): **native BDD per stack** — `pytest-bdd`
+for Python repos, `cucumber-js` for JS/TS repos, Karate only for Java projects.
+Reference implementation: nrl-predictor `scripts/gate/bdd/` (kept outside pytest
+`testpaths` so unit CI never collects live-server scenarios; the binding invokes
+it explicitly). Migration from an imperative acceptance script is
+parity-then-cutover: the binding runs both until the scenario suite covers
+everything the script asserts, then the script retires.
+
 ## Metrics emitted
 
 | Event | Fields |
