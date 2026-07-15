@@ -3,7 +3,34 @@
 How to plan, spec, validate, build, simplify, and ship software through an agentic
 harness. Produced 2026-07-04 from `docs/ideas.md` via: divergent research (9 source
 links + 8 web-research topics + whitepaper + 5 hands-on spikes) → evaluation →
-convergence to decisions. **Start with `QUESTIONS.md` — answering it unblocks M0.**
+convergence to decisions.
+
+## Current state (2026-07-16)
+
+The design below is **built and live** through M2 (M0 foundations, M1 guarded
+two-agent loop with live runs, M-parity legacy cutover complete — shims retired
+2026-07-16). What runs today:
+
+- **Gates** (`harness/gates/`, bound per repo via `.claude/harness.json`):
+  `ci` (Stop hook), `verify` (boot + BDD acceptance), `perf` (latency baseline),
+  `mutation` (Stryker, survivor→strengthen loop wired into the controller),
+  `fuzz` (Schemathesis vs an OpenAPI contract — caught a live production bug on
+  its first pilot run).
+- **Per-PR security scanning**: Semgrep + Gitleaks + Trivy as required checks,
+  distributed to consumer repos via a reusable workflow
+  (`.github/workflows/security-reusable.yml`) and thin `@main` callers.
+- **Trust model**: role-scoped hooks client-side + tamper-proof `guard` check
+  server-side (label-authorized protected paths).
+- **Specs of record**: `openspec/specs/` — gate contracts, loop-controller,
+  security-scanning, api-acceptance. Each shipped change is an archived bundle
+  under `openspec/changes/archive/`.
+- **Telemetry**: every gate run and loop event appends to `metrics/events/`
+  (schema: `metrics.md`).
+
+Live reference repos: this one (self-hosted), nrl-predictor (full surface:
+scanners, BDD acceptance, fuzz), kickpool + aitutor (gate bindings; scanner
+fan-out in progress). Historical framing below (Q-numbers, "unblocks M0") is
+retained as the design record.
 
 ## Reading order
 

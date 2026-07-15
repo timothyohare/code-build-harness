@@ -1,6 +1,7 @@
 # Enterprise adoption plan
 
-Status: draft (Tim + Claude, 2026-07-05)
+Status: current (Tim + Claude; drafted 2026-07-05, refreshed 2026-07-16 — the
+prerequisites in §Sequencing are now DONE and the payload is stable)
 Related: `harness/decisions.md` (D-1…D-25), `harness/legacy-parity.md`, `harness/metrics.md`
 
 How to transfer this harness — its findings, methodology, and enforcement design —
@@ -87,21 +88,25 @@ Items that were absent from "pass in the docs, build something similar, fill gap
 
 ## Sequencing relative to this repo
 
-Two prerequisites in this repo before the transfer payload is stable:
+Both prerequisites are **complete** (kept here because the sequencing pattern
+itself transfers):
 
-- **Finish M-parity first.** The migration plan is `legacy-parity.md` steps 1–6;
-  next task is porting `lib/harness.mjs` → `harness/gates/resolve.mjs` with unit
-  tests. The 486-line legacy layer exceeds the ≤~100-line task target, so split:
-  resolver core + explicit binding in one CHG, the autodetect families (Node/Next,
-  Python, SAM) in follow-ups.
-- **Do not change `harness.json` in bound repos (aitutor, kickpool, nrl-predictor)
-  before cutover.** Reference baselines were recorded in CHG-0012, and cutover
-  step 5 requires old and new gates to produce identical verdicts on **identical
-  bindings** — changing bindings now invalidates the comparison and destroys the
-  regression oracle. Inventory the debt now (short list per repo), fix it as
-  separate per-repo changes *after* cutover, when the new gates themselves verify
-  each cleanup. Exception: something actively broken (dead command, wrong key) —
-  fix it and re-record that repo's baseline.
+- **M-parity finished** (steps 1–6b, CHG-0013…0020): resolver + all gates ported
+  with tests, dual-run verified on identical bindings across three repos,
+  forwarding shims served one quiet release and were deleted 2026-07-16. The full
+  execution record is `harness/legacy-parity.md` — use it as the enterprise
+  template for replacing an incumbent tool layer with a rollback story.
+- **Bindings were frozen until cutover**, then cleaned per-repo with the new
+  gates verifying each cleanup — the ordering discipline to name in the
+  enterprise plan.
+
+Since cutover, M2 added the assets an enterprise pitch leads with: per-PR
+security scanning distributed via a **reusable workflow + thin callers** (the
+same central-definition/local-adoption shape an enterprise platform team wants),
+mutation testing with a survivor→strengthen loop, behavioural (BDD) acceptance
+as the `acceptance` binding contract, and schema-driven API fuzzing that caught
+a live production bug on its first pilot run — the strongest single line in the
+adoption pitch.
 
 ## Transfer payload checklist
 
@@ -116,3 +121,6 @@ In priority order:
 | `harness/metrics.md` | Telemetry schema → adoption success metric |
 | Phase docs (`harness/phases/`) | The methodology itself |
 | `harness.json` schema | Stable (frozen by D-25 compatibility rule); safe to document now |
+| `openspec/specs/` | Executable contracts per capability (gates, security-scanning, api-acceptance) — the "what must stay true" layer, framework-agnostic |
+| `.github/workflows/security-reusable.yml` + caller pattern | Central scanner definition, per-repo thin adoption — maps directly onto an enterprise platform-team model |
+| Pilot drill records (CHG-0021 mutation drill, CHG-0026 fuzz pilot) | Evidence the gates catch seeded and real faults — the "blind sensors" rebuttal |
