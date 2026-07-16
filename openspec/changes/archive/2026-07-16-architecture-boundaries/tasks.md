@@ -9,4 +9,4 @@
       failed lint naming the rule, reverted
 - [x] 1.3 Rider: qs override ^6.15.2 (GHSA-q8mj-m7cp-5q26 via stryker →
       typed-rest-client); npm audit 0 vulnerabilities; suite 86 green
-- [ ] 1.4 PR; merge; archive bundle
+- [x] 1.4 PR; merge; archive bundle
