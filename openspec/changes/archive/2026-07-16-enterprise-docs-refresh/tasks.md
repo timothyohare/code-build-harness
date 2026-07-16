@@ -7,4 +7,4 @@
       from canonical path
 - [x] 1.2 README Current-state section; CLAUDE.md commands + required checks;
       enterprise-adoption.md refresh; legacy-parity.md step-6 completion record
-- [ ] 1.3 PR; merge; archive bundle
+- [x] 1.3 PR; merge; archive bundle (PR #33 merged d8813ae; archived 2026-07-16)
