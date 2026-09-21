@@ -6,6 +6,8 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClaudeExecutor } from '../controller/executors/claude-cli.mjs';
+import { createCodexExecutor } from '../controller/executors/codex-cli.mjs';
+import { createRoleRouter } from '../controller/executors/router.mjs';
 import { createLoop } from '../controller/loop.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -60,10 +62,19 @@ const task = {
 };
 
 const taskId = process.env.HARNESS_TASK_ID || 'CHG-0007';
+const claude = createClaudeExecutor({ cwd: ROOT, timeoutMs: 10 * 60 * 1000 });
+const codex = createCodexExecutor({
+  cwd: ROOT,
+  outputSchema: path.join(ROOT, 'harness', 'review', 'review.schema.json'),
+  outputSchemas: {
+    'test-writer': path.join(ROOT, 'harness', 'controller', 'executors', 'test-changes.schema.json'),
+  },
+  timeoutMs: 10 * 60 * 1000,
+});
 const loop = createLoop({
   taskId,
   root: ROOT,
-  executor: createClaudeExecutor({ cwd: ROOT, timeoutMs: 10 * 60 * 1000 }),
+  executor: createRoleRouter({ builder: claude, 'test-writer': codex, reviewer: codex }),
   gates,
   caps: { consecutiveGateReds: 2, totalIterations: 3 }, // tightened for the first live run
 });

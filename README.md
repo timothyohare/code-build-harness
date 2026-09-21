@@ -18,6 +18,8 @@ convergence (2026-07-04/05).
 | `docs/harness/` | Design docs, decisions (D-1…D-20), phase guides, research |
 | `harness/hooks/` | PreToolUse guardrails: role-based path protection, Bash guard |
 | `harness/controller/` | Loop controller components (JSONL event emitter, …) |
+| `harness/controller/executors/` | Claude, Codex, and role-routing adapters |
+| `harness/review/` | Bounded review packages, schema validation, finding routing |
 | `metrics/events/` | Append-only JSONL event log (schema: docs/harness/metrics.md) |
 | `openspec/` | Spec store + change bundles (OpenSpec) |
 | `tests/` | Test-writer-owned; builders are blocked by hook + CI check |
@@ -41,3 +43,22 @@ covers syntax + tests). Revisit when the controller gains TS.
 
 M0 (foundations) in progress — see `docs/harness/architecture.md` for the M0–M5 build
 order and exit criteria.
+
+## Two-family execution
+
+The live build loop routes `test-writer` to an ephemeral Codex CLI process and
+`builder` to a fresh Claude CLI process. GREEN and CI failures return directly to
+the builder; mutation-strengthening failures remain with the test writer.
+
+Run an independent Codex review by piping a JSON evidence object containing `spec`,
+`plan`, `diff`, `tests`, `gates`, and optional `disagreements` fields:
+
+```sh
+node harness/review/run-review.mjs < review-evidence.json
+```
+
+The command exits 2 for insufficient context, malformed output, or any blocking
+high-confidence finding. Codex test-writing sessions are read-only: they return
+schema-constrained full-file proposals, and the harness applies them only after
+validating test ownership, repository containment, symlinks, duplicates, and size.
+CI protected-path checks remain the authoritative remote backstop.

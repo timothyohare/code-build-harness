@@ -62,7 +62,7 @@ test('role file is set per step: test-writer then builder', async () => {
   ]);
 });
 
-test('gate failure feeds back to the executor next attempt', async () => {
+test('builder GREEN failure retries the builder without rewriting tests', async () => {
   const feedbackSeen = [];
   const executor = async ({ step, feedback }) => {
     feedbackSeen.push([step, feedback]);
@@ -75,10 +75,51 @@ test('gate failure feeds back to the executor next attempt', async () => {
   const res = await loop.runBuildTask({ name: 'demo' });
   assert.equal(res.status, 'green');
   assert.equal(res.iterations, 2);
-  // iteration 2's first step received the green-gate failure as feedback
-  const secondIterTestStep = feedbackSeen[2];
-  assert.equal(secondIterTestStep[0], 'write-failing-test');
-  assert.deepEqual(secondIterTestStep[1], [{ gate: 'green', detail: 'boom' }]);
+  assert.deepEqual(
+    feedbackSeen.map(([step]) => step),
+    ['write-failing-test', 'implement', 'implement'],
+  );
+  assert.deepEqual(feedbackSeen[2][1], [{ gate: 'green', detail: 'boom' }]);
+});
+
+test('builder CI failure retries the builder without rewriting tests', async () => {
+  const stepsSeen = [];
+  const executor = async ({ step, feedback }) => {
+    stepsSeen.push([step, feedback]);
+    return {};
+  };
+  const loop = makeLoop({
+    executor,
+    gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([FAIL, PASS]) },
+  });
+  const res = await loop.runBuildTask({ name: 'demo' });
+  assert.equal(res.status, 'green');
+  assert.deepEqual(
+    stepsSeen.map(([step]) => step),
+    ['write-failing-test', 'implement', 'implement'],
+  );
+  assert.deepEqual(stepsSeen[2][1], [{ gate: 'ci', detail: 'boom' }]);
+});
+
+test('persisted builder retry ownership survives resume', async () => {
+  const first = makeLoop({
+    gates: { red: scriptedGate([PASS]), green: scriptedGate([FAIL]), ci: scriptedGate([PASS]) },
+    caps: { consecutiveGateReds: 1, totalIterations: 5 },
+  });
+  const escalated = await first.runBuildTask({ name: 'demo' });
+  assert.equal(escalated.status, 'escalated');
+
+  const stepsSeen = [];
+  const resumed = makeLoop({
+    executor: async ({ step }) => {
+      stepsSeen.push(step);
+      return {};
+    },
+    gates: { red: scriptedGate([PASS]), green: scriptedGate([PASS]), ci: scriptedGate([PASS]) },
+  });
+  const res = await resumed.runBuildTask({ name: 'demo' });
+  assert.equal(res.status, 'green');
+  assert.deepEqual(stepsSeen, ['implement']);
 });
 
 test('3 consecutive reds on one gate escalates with handoff note', async () => {
@@ -95,12 +136,12 @@ test('3 consecutive reds on one gate escalates with handoff note', async () => {
 });
 
 test('total-iteration cap escalates even when gates alternate', async () => {
-  // red fails every 2nd attempt so no single gate hits 3 consecutive
-  let n = 0;
   const gates = {
-    red: async () => (++n % 2 === 0 ? PASS : FAIL),
-    green: scriptedGate([FAIL]), // green always fails when reached
-    ci: scriptedGate([PASS]),
+    red: scriptedGate([PASS]),
+    // Ownership-aware retries alternate between GREEN and CI failures so no
+    // individual gate reaches its consecutive-red cap first.
+    green: scriptedGate([FAIL, PASS, FAIL, PASS]),
+    ci: scriptedGate([FAIL]),
   };
   const loop = makeLoop({ gates, caps: { consecutiveGateReds: 3, totalIterations: 4 } });
   const res = await loop.runBuildTask({ name: 'demo' });
