@@ -85,8 +85,7 @@ evidence package.
 
 - [x] Commit the completed Claude builder/Codex test-writer and reviewer foundation.
 - [x] Exclude pre-existing `metrics/events/**` working-tree changes.
-- [ ] Push `feature/claude-codex-foundation` and open a PR to `main`. (Branch pushed;
-  PR creation awaits renewed GitHub authentication.)
+- [x] Push `feature/claude-codex-foundation` and open a PR to `main` (#42).
 - [ ] Apply `harness-config-approved` and `tests-approved` when available.
 
 **Acceptance criteria:** full CI, mutation, and diff checks pass; the PR contains the
@@ -98,17 +97,16 @@ OpenSpec bundle and no unrelated metrics history.
 - [x] Route implementation findings to Claude and coverage findings to Codex.
 - [x] Re-run owner-specific gates after corrections and re-review rebuilt evidence.
 - [x] Persist review state, findings, attempts, and escalation artifacts.
-- [ ] Push a stacked branch and open a PR targeting PR 1's branch. (Implementation
-  is green; PR creation awaits renewed GitHub authentication.)
+- [x] Push a stacked branch and open a PR targeting PR 1's branch (#43).
 
 **Acceptance criteria:** tests cover clean review, owner-routed correction,
 insufficient context, malformed output, critical findings, and retry-cap escalation.
 
 ### PR 3: Supervised Pilot and Seeded-Defect Evaluation
 
-- [ ] Replace the hardcoded live task with an input-driven supervised pilot command.
-- [ ] Add deterministic fixture executors for CI and optional real-CLI execution for a human-supervised run.
-- [ ] Add seeded correctness, security, and coverage defects with catch-rate metrics.
+- [x] Replace the hardcoded live task with an input-driven supervised pilot command.
+- [x] Add deterministic fixture executors for CI and optional real-CLI execution for a human-supervised run.
+- [x] Add configurable seeded defects with owner/category/evidence matching and catch-rate metrics.
 - [ ] Push a stacked branch and open a PR targeting PR 2's branch.
 
 **Acceptance criteria:** the deterministic end-to-end pilot proves
