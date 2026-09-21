@@ -62,3 +62,11 @@ high-confidence finding. Codex test-writing sessions are read-only: they return
 schema-constrained full-file proposals, and the harness applies them only after
 validating test ownership, repository containment, symlinks, duplicates, and size.
 CI protected-path checks remain the authoritative remote backstop.
+
+`createDeliveryLoop` composes deterministic build validation with
+`createReviewLoop`: review starts only after the build is green. The review loop
+routes coverage corrections to Codex before routing implementation corrections to
+Claude, runs owner-specific gates, rebuilds the evidence, and asks a fresh reviewer
+again. It persists state under `memory/review-state/` and writes a human handoff on
+insufficient context, malformed output, critical findings, failed correction gates,
+or the review-round cap.
