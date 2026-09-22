@@ -16,8 +16,12 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+# No permissions block here — a called workflow's permissions CAP the
+# caller's grant, so declaring one silently downgrades every consumer's
+# token. Jobs inherit the caller's grant instead; callers declare least
+# privilege themselves: contents: read, plus pull-requests: read on PRIVATE
+# repos (gitleaks-action lists the PR's commits via the API, which 403s
+# "Resource not accessible by integration" without it — CHG-0029).
 
 jobs:
   semgrep:
