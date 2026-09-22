@@ -16,13 +16,13 @@ committee (heterogeneous teams underperform their best member by up to 37.6%; ex
 rounds add noise, not signal):
 
 ```
-1. PRIMARY REVIEW — cross-family model (Gemini per Q5), FRESH session:
+1. PRIMARY REVIEW — ChatGPT/Codex, FRESH ephemeral session:
      input:  compact review package = spec + plan + tasks + diff briefs (markdown)
      contract: review AGAINST THE SPEC, five axes
                (correctness, readability, architecture, security, performance)
      output: findings with confidence scores; findings < 70 confidence hidden
      escape hatch: "context insufficient" flag → rerun with full package
-2. JUDGE — cheap model (Haiku-class):
+2. JUDGE — cheap model (Haiku-class; deferred until primary-review metrics exist):
      scores the REVIEW (not the code) against a rubric with randomized ordering
      and numeric anchors; low score → rerun review or escalate
 3. FREE EXTRA SIGNALS — Copilot code review on the PR (GitHub-native), advisory only

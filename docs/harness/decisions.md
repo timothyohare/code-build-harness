@@ -62,6 +62,7 @@ New decisions from this ratification:
 | D-23 | Observability: OTel instrumentation everywhere; personal backend AWS-native; enterprise adapters (Sumo Logic, Dynatrace) deferred until work constraints are known | **Final** |
 | D-24 | Builder agents get scoped `Bash(npm test)` (and only that) via `--allowedTools` for inner-loop feedback; authoritative verification remains the controller's gates; bash-guard hook stays as backstop (Tim, 2026-07-05, after first live run) | **Final** |
 | D-25 | This harness **replaces** the legacy `~/.claude/{bin,lib}` gate layer. No legacy feature is dropped without an explicit decision; `harness.json` schema stays compatible; migration per `legacy-parity.md` (port gates with event telemetry added, dual-run cutover check per bound repo, forwarding shims before removal) (Tim, 2026-07-05) | **Final** |
+| D-26 | Initial two-family topology: ChatGPT/Codex owns tests and fresh-context primary review; Claude owns implementation. Retry feedback returns to the role that owns the failing artifact. Add the cheap review judge only after primary-review efficacy is measured. | **Final** (Tim, 2026-09-21) |
 
 | ID | Decision | Status | Rationale / evidence |
 |---|---|---|---|

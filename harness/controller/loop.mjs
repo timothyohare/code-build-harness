@@ -154,6 +154,7 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
       lastStep: null,
       blockingGate: null,
       mode: null,
+      retryOwner: null,
     };
     state.status = 'running';
     const feedback = [];
@@ -169,18 +170,28 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
           // The mode is sticky (even across a green/ci red on the strengthened
           // test) until mutation passes or the task escalates: TDD is done at
           // this point, so re-verifying RED would demand a wrong test.
+          state.retryOwner = 'test-writer';
           await step(state, 'test-writer', 'strengthen-tests', feedback.splice(0));
+          const green = await runGate(state, 'green', feedback);
+          if (green.escalation) return green.escalation;
+          if (!green.pass) continue;
+        } else if (state.retryOwner === 'builder') {
+          // Tests are already verified RED. GREEN and CI failures belong to the
+          // implementation, so retry the builder without allowing test churn.
+          await step(state, 'builder', 'implement', feedback.splice(0));
           const green = await runGate(state, 'green', feedback);
           if (green.escalation) return green.escalation;
           if (!green.pass) continue;
         } else {
           // 1. test-writer produces the failing test; RED must be verified by running it.
+          state.retryOwner = 'test-writer';
           await step(state, 'test-writer', 'write-failing-test', feedback.splice(0));
           const red = await runGate(state, 'red', feedback);
           if (red.escalation) return red.escalation;
           if (!red.pass) continue;
 
           // 2. builder implements the minimum to pass; GREEN verified.
+          state.retryOwner = 'builder';
           await step(state, 'builder', 'implement', feedback.splice(0));
           const green = await runGate(state, 'green', feedback);
           if (green.escalation) return green.escalation;
@@ -191,6 +202,7 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
         const ci = await runGate(state, 'ci', feedback);
         if (ci.escalation) return ci.escalation;
         if (!ci.pass) continue;
+        state.retryOwner = null;
 
         // 4. mutation gate (optional — M2 "grade the graders"): a red here flips
         // the loop into survivor-strengthening mode above.
@@ -199,6 +211,7 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
           if (mu.escalation) return mu.escalation;
           if (!mu.pass) {
             state.mode = 'strengthen';
+            state.retryOwner = 'test-writer';
             continue;
           }
         }
@@ -206,6 +219,7 @@ export function createLoop({ taskId, root, executor, gates, caps = DEFAULT_CAPS,
         state.status = 'green';
         state.blockingGate = null;
         state.mode = null;
+        state.retryOwner = null;
         saveState(state);
         emit({
           task_id: taskId,
