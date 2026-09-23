@@ -83,9 +83,10 @@ evidence package.
 
 ### PR 1: Two-Family Foundation
 
-- [ ] Commit the completed Claude builder/Codex test-writer and reviewer foundation.
-- [ ] Exclude pre-existing `metrics/events/**` working-tree changes.
-- [ ] Push `feature/claude-codex-foundation` and open a PR to `main`.
+- [x] Commit the completed Claude builder/Codex test-writer and reviewer foundation.
+- [x] Exclude pre-existing `metrics/events/**` working-tree changes.
+- [ ] Push `feature/claude-codex-foundation` and open a PR to `main`. (Branch pushed;
+  PR creation awaits renewed GitHub authentication.)
 - [ ] Apply `harness-config-approved` and `tests-approved` when available.
 
 **Acceptance criteria:** full CI, mutation, and diff checks pass; the PR contains the
@@ -93,11 +94,12 @@ OpenSpec bundle and no unrelated metrics history.
 
 ### PR 2: Automatic Review Orchestration
 
-- [ ] Add a review state machine after deterministic validation.
-- [ ] Route implementation findings to Claude and coverage findings to Codex.
-- [ ] Re-run owner-specific and final gates after corrections.
-- [ ] Persist review state, findings, attempts, and escalation artifacts.
-- [ ] Push a stacked branch and open a PR targeting PR 1's branch.
+- [x] Add a review state machine after deterministic validation.
+- [x] Route implementation findings to Claude and coverage findings to Codex.
+- [x] Re-run owner-specific gates after corrections and re-review rebuilt evidence.
+- [x] Persist review state, findings, attempts, and escalation artifacts.
+- [ ] Push a stacked branch and open a PR targeting PR 1's branch. (Implementation
+  is green; PR creation awaits renewed GitHub authentication.)
 
 **Acceptance criteria:** tests cover clean review, owner-routed correction,
 insufficient context, malformed output, critical findings, and retry-cap escalation.
