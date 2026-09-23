@@ -75,5 +75,5 @@
 
 - [x] PR 1: Ship the two-family foundation (#42).
 - [x] PR 2: Integrate automatic review and correction orchestration (#43).
-- [ ] PR 3: Add the supervised pilot and seeded-defect evaluation. (Implementation and gates complete; PR pending.)
-- [ ] PR 4: Remediate high-severity development dependency advisories independently.
+- [x] PR 3: Add the supervised pilot and seeded-defect evaluation (#44).
+- [x] PR 4: Remediate high-severity development dependency advisories independently (#45).

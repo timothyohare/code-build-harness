@@ -107,7 +107,7 @@ insufficient context, malformed output, critical findings, and retry-cap escalat
 - [x] Replace the hardcoded live task with an input-driven supervised pilot command.
 - [x] Add deterministic fixture executors for CI and optional real-CLI execution for a human-supervised run.
 - [x] Add configurable seeded defects with owner/category/evidence matching and catch-rate metrics.
-- [ ] Push a stacked branch and open a PR targeting PR 2's branch.
+- [x] Push a stacked branch and open a PR targeting PR 2's branch (#44).
 
 **Acceptance criteria:** the deterministic end-to-end pilot proves
 spec → tests → build → validate → review → correction → final green, and seeded
@@ -115,17 +115,17 @@ defect outcomes are emitted to the event log.
 
 ### PR 4: Dependency Remediation
 
-- [ ] Create an independent worktree from `main`.
-- [ ] Preview minimal dependency upgrades for the high-severity audit findings.
-- [ ] Review the lockfile diff and reject unrelated major upgrades.
-- [ ] Run full CI, mutation, and `npm audit --audit-level=high`.
-- [ ] Push and open an independent PR to `main`.
+- [x] Create an independent worktree from `main`.
+- [x] Preview minimal dependency upgrades for the high-severity audit findings.
+- [x] Review the lockfile diff and reject unrelated major upgrades.
+- [x] Run full CI, mutation, and `npm audit --audit-level=high`.
+- [x] Push and open an independent PR to `main` (#45).
 
 **Acceptance criteria:** no reachable high/critical audit findings remain and no
 quality threshold is weakened.
 
 ### Final Checkpoint
 
-- [ ] Every PR is small enough to review independently and has a rollback boundary.
-- [ ] All created PRs are attached or linked in the handoff.
-- [ ] The cheap judge remains deferred until primary-review pilot metrics exist.
+- [x] Every PR is small enough to review independently and has a rollback boundary.
+- [x] All created PRs are attached or linked in the handoff.
+- [x] The cheap judge remains deferred until primary-review pilot metrics exist.
