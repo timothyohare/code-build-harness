@@ -123,7 +123,16 @@ export function createReviewLoop({
   }
 
   async function run() {
-    const state = loadState() ?? { taskId, status: 'reviewing', rounds: 0, history: [], findings: [], advisory: [] };
+    const state = loadState() ?? {
+      taskId,
+      status: 'reviewing',
+      rounds: 0,
+      history: [],
+      findings: [],
+      advisory: [],
+      detectedFindingIds: [],
+      observedFindings: [],
+    };
     state.status = 'reviewing';
     try {
       while (state.rounds < caps.reviewRounds) {
@@ -143,6 +152,14 @@ export function createReviewLoop({
         }
         const { review, routed } = result;
         state.findings = [...routed['test-writer'], ...routed.builder];
+        state.detectedFindingIds = [
+          ...new Set([...(state.detectedFindingIds ?? []), ...state.findings.map((finding) => finding.id)]),
+        ];
+        state.observedFindings = [
+          ...(state.observedFindings ?? []),
+          ...routed['test-writer'].map((finding) => ({ ...finding, owner: 'test-writer' })),
+          ...routed.builder.map((finding) => ({ ...finding, owner: 'builder' })),
+        ];
         state.advisory = routed.advisory;
         state.history.push(`review round ${state.rounds}: ${review.summary}`);
         emit({

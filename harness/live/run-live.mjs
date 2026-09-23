@@ -1,14 +1,21 @@
 #!/usr/bin/env node
 import { execSync } from 'node:child_process';
-// First supervised live loop run (M1 milestone). Drives the two-agent TDD cycle
-// with real `claude -p` sub-agents and real gates against this repo.
+// Supervised live delivery run. Drives the Claude/Codex TDD and review cycle
+// from a validated input file against this repo.
 // Watch progress: tail -f metrics/events/$(date +%Y-%m).jsonl
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createDeliveryLoop } from '../controller/delivery-loop.mjs';
+import { emit } from '../controller/emit-event.mjs';
 import { createClaudeExecutor } from '../controller/executors/claude-cli.mjs';
 import { createCodexExecutor } from '../controller/executors/codex-cli.mjs';
 import { createRoleRouter } from '../controller/executors/router.mjs';
 import { createLoop } from '../controller/loop.mjs';
+import { createReviewLoop } from '../controller/review-loop.mjs';
+import { evaluateSeededDefects } from '../pilot/evaluation.mjs';
+import { loadPilotConfig } from '../pilot/input.mjs';
+import { createReviewRunner } from '../review/runner.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -43,25 +50,15 @@ const gates = {
   mutation: async () => sh(`node ${path.join(ROOT, 'harness', 'gates', 'mutation.mjs')}`),
 };
 
-const task = {
-  name: 'token-cost-calculator',
-  description: [
-    'Create src/cost.mjs exporting a pure function costUsd(usage, pricing).',
-    'usage: { model, tokens_in, tokens_out } (token counts may be null/undefined → treat as 0).',
-    'pricing: map of model id → { in: USD per million input tokens, out: USD per million output tokens }.',
-    'Returns the cost in USD as a number, or null when usage.model is absent from pricing.',
-    'No hardcoded prices anywhere — pricing always comes from the caller.',
-  ].join(' '),
-  acceptance: [
-    'costUsd({model:"m1",tokens_in:1_000_000,tokens_out:0}, {m1:{in:5,out:25}}) === 5',
-    'costUsd({model:"m1",tokens_in:500_000,tokens_out:200_000}, {m1:{in:5,out:25}}) === 7.5',
-    'costUsd({model:"unknown",tokens_in:10,tokens_out:10}, {m1:{in:5,out:25}}) === null',
-    'costUsd({model:"m1"}, {m1:{in:5,out:25}}) === 0 (missing token counts treated as 0)',
-    'Test file lives at tests/cost.test.mjs using node:test.',
-  ].join('\n'),
-};
+const input = process.argv[2];
+if (!input) {
+  process.stderr.write('usage: node harness/live/run-live.mjs <pilot.json>\n');
+  process.exit(1);
+}
+const config = loadPilotConfig(path.resolve(process.cwd(), input));
+const task = config.task;
 
-const taskId = process.env.HARNESS_TASK_ID || 'CHG-0007';
+const taskId = process.env.HARNESS_TASK_ID || task.id;
 const claude = createClaudeExecutor({ cwd: ROOT, timeoutMs: 10 * 60 * 1000 });
 const codex = createCodexExecutor({
   cwd: ROOT,
@@ -71,15 +68,88 @@ const codex = createCodexExecutor({
   },
   timeoutMs: 10 * 60 * 1000,
 });
-const loop = createLoop({
+const executor = createRoleRouter({ builder: claude, 'test-writer': codex, reviewer: codex });
+const buildLoop = createLoop({
   taskId,
   root: ROOT,
-  executor: createRoleRouter({ builder: claude, 'test-writer': codex, reviewer: codex }),
+  executor,
   gates,
   caps: { consecutiveGateReds: 2, totalIterations: 3 }, // tightened for the first live run
 });
 
-console.log(`[live] starting loop for ${taskId}: ${task.name}`);
-const res = await loop.runBuildTask(task);
-console.log('[live] result:', JSON.stringify(res, null, 2));
-process.exit(res.status === 'green' ? 0 : 1);
+function gitText(command) {
+  return execSync(command, { cwd: ROOT, encoding: 'utf8', timeout: 30_000 });
+}
+
+function untrackedEvidence(prefixes = []) {
+  const excluded = ['memory/', 'metrics/events/', 'node_modules/', 'reports/'];
+  const files = gitText('git ls-files --others --exclude-standard')
+    .split('\n')
+    .filter(Boolean)
+    .filter((file) => !excluded.some((prefix) => file.startsWith(prefix)))
+    .filter((file) => prefixes.length === 0 || prefixes.some((prefix) => file.startsWith(prefix)));
+  return files
+    .map((file) => {
+      const candidate = path.resolve(ROOT, file);
+      if (!candidate.startsWith(`${ROOT}${path.sep}`) || !fs.lstatSync(candidate).isFile()) return '';
+      return `### Untracked: ${file}\n\n${fs.readFileSync(candidate, 'utf8')}`;
+    })
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+const review = createReviewRunner({ executor });
+const reviewLoop = createReviewLoop({
+  taskId,
+  root: ROOT,
+  reviewer: review,
+  evidenceProvider: async () => ({
+    spec: task.acceptance,
+    plan: task.plan ?? 'TDD build, deterministic validation, independent review, and owner-routed correction.',
+    diff: [
+      gitText("git diff --no-ext-diff -- . ':(exclude)memory/**' ':(exclude)metrics/events/**' ':(exclude)reports/**'"),
+      untrackedEvidence(),
+    ]
+      .filter(Boolean)
+      .join('\n\n'),
+    tests: [gitText('git diff --no-ext-diff -- tests fixtures'), untrackedEvidence(['tests/', 'fixtures/'])]
+      .filter(Boolean)
+      .join('\n\n'),
+    gates: 'The controller observed RED, GREEN, CI, and mutation gates passing before review.',
+  }),
+  correctors: {
+    builder: async ({ findings }) =>
+      executor({
+        role: 'builder',
+        step: 'address-review',
+        task,
+        feedback: findings.map((finding) => ({ gate: `review:${finding.id}`, detail: finding.evidence })),
+      }),
+    'test-writer': async ({ findings }) =>
+      executor({
+        role: 'test-writer',
+        step: 'address-review',
+        task,
+        feedback: findings.map((finding) => ({ gate: `review:${finding.id}`, detail: finding.evidence })),
+      }),
+  },
+  gates,
+});
+
+console.log(`[live] starting supervised delivery for ${taskId}: ${task.name}`);
+const result = await createDeliveryLoop({ buildLoop, reviewLoop }).run(task);
+const reviewState = reviewLoop._internals.loadState();
+const evaluation = evaluateSeededDefects(config.seededDefects, reviewState?.observedFindings);
+if (evaluation.seeded > 0) {
+  emit({
+    task_id: taskId,
+    phase: 'review',
+    event: 'seeded_defect_evaluation',
+    agent_role: 'controller',
+    result: evaluation.missed.length === 0 ? 'pass' : 'fail',
+    detail: evaluation,
+  });
+}
+const status = result.status === 'approved' && evaluation.missed.length > 0 ? 'evaluation-failed' : result.status;
+console.log('[live] result:', JSON.stringify({ ...result, status, evaluation }, null, 2));
+process.exit(status === 'approved' ? 0 : 1);

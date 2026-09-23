@@ -73,7 +73,7 @@
 
 ## Rollout Tasks
 
-- [ ] PR 1: Ship the two-family foundation. (Committed and pushed; PR blocked on GitHub authentication.)
-- [ ] PR 2: Integrate automatic review and correction orchestration. (Implementation and gates complete; commit/PR pending.)
-- [ ] PR 3: Add the supervised pilot and seeded-defect evaluation.
-- [ ] PR 4: Remediate high-severity development dependency advisories independently.
+- [x] PR 1: Ship the two-family foundation (#42).
+- [x] PR 2: Integrate automatic review and correction orchestration (#43).
+- [x] PR 3: Add the supervised pilot and seeded-defect evaluation (#44).
+- [x] PR 4: Remediate high-severity development dependency advisories independently (#45).
