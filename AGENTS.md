@@ -7,7 +7,7 @@ Full design: `docs/harness/README.md`. Decisions register: `docs/harness/decisio
 ## Commands (the proof, not the claim)
 
 - `npm run lint` — Biome lint + format check over all `.mjs`
-- `npm test` — gates + hooks + controller suite (86 tests). Must be green before any "done" claim.
+- `npm test` — gates + hooks + controller suite. Must be green before any "done" claim.
 - `npx stryker run` — mutation gate on this repo (`thresholds.break=100`; incremental history committed). Survivors: strengthen tests, never lower the threshold.
 - `node harness/controller/emit-event.mjs --event <name> [--phase p --task-id CHG-NNNN --agent-role r --result pass|fail|blocked|escalated --detail '{}']` — log a loop event (schema: `docs/harness/metrics.md`)
 
@@ -25,7 +25,7 @@ false. Run the gate; paste the output.
 - Roles come from `.harness-role` (written by the loop controller; absent = human session).
 - `tests/**`, `*.test.*`, `fixtures/**` — owned by the test-writer role. Builders:
   write requests to `memory/test-requests.md`, never edit tests directly.
-- `.github/**`, `harness/hooks/**`, `harness/controller/**`, `.Codex/**`, `CODEOWNERS`
+- `.github/**`, `harness/hooks/**`, `harness/controller/**`, `.claude/**`, `CODEOWNERS`
   — human-only. PRs touching these fail the `guard` check unless a human applies the
   `harness-config-approved` label (`tests-approved` for test paths).
 - If a hook blocks you: do what the block message says (usually: write the request to
