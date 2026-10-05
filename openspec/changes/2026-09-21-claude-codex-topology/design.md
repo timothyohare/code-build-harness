@@ -29,4 +29,12 @@ review rounds by default.
 ## Deferred Work
 
 - Cheap-model judging of primary-review quality.
-- Seeded-defect experiments and production model pinning.
+- Production model pinning after supervised seeded-defect results are collected.
+
+## Pilot Evaluation
+
+The fixture pilot deterministically exercises the complete build, validation,
+review, correction, re-review, and telemetry path. The supervised live command uses
+the same validated task input with real Claude and Codex executors. Seed metadata is
+kept out of the review package; evaluation compares observed findings with expected
+owner/category plus a finding ID or evidence marker.

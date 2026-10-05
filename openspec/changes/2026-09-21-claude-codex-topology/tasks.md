@@ -12,5 +12,8 @@
 - [x] Harden project-root resolution against synthetic `/tmp/.git` markers.
 - [x] Add post-validation review orchestration with owner-routed corrections.
 - [x] Persist review attempts and fail-closed human handoffs.
-- [x] Pass `node harness/gates/ci.mjs --force --full` (117/117 tests).
+- [x] Replace the hardcoded live task with validated JSON input.
+- [x] Add a deterministic end-to-end fixture pilot and seeded-defect metrics.
+- [x] Add input-driven supervised execution using real Claude and Codex CLIs.
+- [x] Pass `node harness/gates/ci.mjs --force --full` (122/122 tests).
 - [x] Pass `node harness/gates/mutation.mjs` (100% mutation score).

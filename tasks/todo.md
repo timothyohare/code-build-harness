@@ -73,7 +73,38 @@
 
 ## Rollout Tasks
 
-- [ ] PR 1: Ship the two-family foundation. (Committed and pushed; PR blocked on GitHub authentication.)
-- [ ] PR 2: Integrate automatic review and correction orchestration. (Implementation and gates complete; commit/PR pending.)
-- [ ] PR 3: Add the supervised pilot and seeded-defect evaluation.
-- [ ] PR 4: Remediate high-severity development dependency advisories independently.
+- [x] PR 1: Ship the two-family foundation (#42).
+- [x] PR 2: Integrate automatic review and correction orchestration (#43).
+- [x] PR 3: Add the supervised pilot and seeded-defect evaluation (#44).
+- [x] PR 4: Remediate high-severity development dependency advisories independently (#45).
+
+## Task 8: Protect the Codex config like the Claude config
+
+`.claude/` is guarded by the PR `guard` check and CODEOWNERS, but `.codex/` and
+`AGENTS.md` aren't, so an agent could switch off the Codex hooks unnoticed.
+Human-only change: the PR needs the `harness-config-approved` label.
+
+**Acceptance criteria:**
+
+- [ ] `.github/workflows/guard.yml` treats `.codex/` as a protected path.
+- [ ] CODEOWNERS lists `/.codex/` and `/AGENTS.md`.
+- [ ] `protect-paths.mjs` blocks agent edits to `.codex/` config, as it does `.claude/settings*.json`.
+- [ ] `AGENTS.md` and `CLAUDE.md` list `.codex/**` as human-only once it's enforced.
+
+**Verification:** a PR touching `.codex/` without the label fails `guard`; hook tests and full CI gate.
+
+## Task 9: Block Codex `apply_patch` edits to protected paths
+
+Codex edits files with `apply_patch`, which sends a patch, not a `file_path`.
+`protect-paths.mjs` only checks Edit/Write/MultiEdit/NotebookEdit, so Codex edits
+to tests or harness paths pass straight through. Human-only change
+(`harness/hooks/**`). See https://learn.chatgpt.com/docs/hooks for the payload.
+
+**Acceptance criteria:**
+
+- [ ] `.codex/hooks.json` matches `apply_patch` for `protect-paths.mjs`.
+- [ ] `protect-paths.mjs` reads every file path an `apply_patch` touches (add, update, delete, move) and applies the same role rules.
+- [ ] A patch touching any protected path is blocked (exit 2 with the reason on stderr), even if its other files are allowed.
+- [ ] Malformed patches fail closed.
+
+**Verification:** hook tests with sample `apply_patch` payloads, full CI gate, and a manual check in a Codex session.

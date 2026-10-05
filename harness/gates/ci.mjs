@@ -14,13 +14,43 @@ import { loadConfig } from './resolve.mjs';
 const FULL = process.argv.includes('--full');
 const FORCE = process.argv.includes('--force');
 
-async function readStdin() {
-  if (process.stdin.isTTY) return '';
-  const chunks = [];
-  try {
-    for await (const c of process.stdin) chunks.push(c);
-  } catch {}
-  return Buffer.concat(chunks).toString('utf8');
+// The Stop hook pipes in a small JSON object. Run by hand (especially from an
+// agent's shell), stdin can be an inherited pipe or socket that never closes,
+// so don't wait for EOF: stop once what has arrived parses as JSON, or after
+// STDIN_WAIT_MS with no new input.
+const STDIN_WAIT_MS = 1000;
+
+function readStdin() {
+  if (process.stdin.isTTY) return Promise.resolve('');
+  return new Promise((resolve) => {
+    let buf = '';
+    let finished = false;
+    let timer;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      process.stdin.destroy(); // let the process exit even if the writer never closes
+      resolve(buf);
+    };
+    const wait = () => {
+      clearTimeout(timer);
+      timer = setTimeout(done, STDIN_WAIT_MS);
+    };
+    wait();
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (c) => {
+      buf += c;
+      try {
+        JSON.parse(buf);
+        done();
+      } catch {
+        wait(); // partial JSON: keep reading
+      }
+    });
+    process.stdin.on('end', done);
+    process.stdin.on('error', done);
+  });
 }
 
 // Cheap guard so the Stop hook is near-free when there's nothing to check.
@@ -33,7 +63,10 @@ function sourceChanged(root) {
   }
 }
 
-const input = JSON.parse((await readStdin()) || '{}');
+let input = {};
+try {
+  input = JSON.parse((await readStdin()) || '{}');
+} catch {} // not hook JSON (e.g. stray input when run by hand): treat as a manual run
 // Loop guard: if we're already continuing from a Stop hook, let it stop.
 if (input.stop_hook_active) process.exit(0);
 
