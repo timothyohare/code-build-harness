@@ -10,5 +10,7 @@
 - [x] Run Codex test writing read-only and apply only validated test-owned proposals.
 - [x] Reject traversal, symlink escapes, protected paths, duplicates, and oversized output.
 - [x] Harden project-root resolution against synthetic `/tmp/.git` markers.
-- [x] Pass `node harness/gates/ci.mjs --force --full` (102/102 tests).
+- [x] Add post-validation review orchestration with owner-routed corrections.
+- [x] Persist review attempts and fail-closed human handoffs.
+- [x] Pass `node harness/gates/ci.mjs --force --full` (117/117 tests).
 - [x] Pass `node harness/gates/mutation.mjs` (100% mutation score).
