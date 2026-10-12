@@ -1,0 +1,25 @@
+{
+  "task": {
+    "id": "PILOT-EXAMPLE",
+    "name": "example-value",
+    "description": "Implement the example value behavior.",
+    "acceptance": "The feature returns the expected value for normal and boundary inputs.",
+    "plan": "Write failing tests, implement the behavior, run deterministic gates, and independently review the evidence."
+  },
+  "seededDefects": [
+    {
+      "id": "SEED-CORRECTNESS",
+      "category": "correctness",
+      "owner": "builder",
+      "severity": "high",
+      "evidenceIncludes": "SEED-CORRECTNESS"
+    },
+    {
+      "id": "SEED-COVERAGE",
+      "category": "coverage",
+      "owner": "test-writer",
+      "severity": "medium",
+      "evidenceIncludes": "SEED-COVERAGE"
+    }
+  ]
+}

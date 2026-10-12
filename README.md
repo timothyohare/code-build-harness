@@ -70,3 +70,25 @@ Claude, runs owner-specific gates, rebuilds the evidence, and asks a fresh revie
 again. It persists state under `memory/review-state/` and writes a human handoff on
 insufficient context, malformed output, critical findings, failed correction gates,
 or the review-round cap.
+
+## Supervised pilot
+
+Run the deterministic end-to-end fixture (safe for CI and local plumbing checks):
+
+```sh
+node harness/pilot/run-pilot.mjs examples/pilot.json
+```
+
+Run the same input through real Claude and Codex CLI processes under human
+supervision (this can edit the working tree and consume model credits):
+
+```sh
+node harness/live/run-live.mjs path/to/pilot.json
+```
+
+The input declares the task and optional seeded defects. Live seeded defects must
+already exist in the task workspace; they are not disclosed to the reviewer.
+Evaluation matches observed findings by owner and category, then by finding ID or
+the optional `evidenceIncludes` marker, and emits a `seeded_defect_evaluation` event.
+The deterministic fixture validates orchestration and telemetry—not model quality;
+only supervised live runs provide model catch-rate evidence.

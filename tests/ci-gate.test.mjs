@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -131,6 +131,62 @@ test('non-git directory does not suppress the run', () => {
     const r = runGate(fx);
     assert.equal(r.status, 0);
     assert.ok(existsSync(join(fx.root, 'lint.ran')));
+  } finally {
+    rmSync(fx.root, { recursive: true, force: true });
+  }
+});
+
+test('stdin that never closes does not hang the gate', async () => {
+  // An agent's shell can hand the gate an inherited stdin that stays open
+  // forever. The gate must give up waiting for hook input and run its steps.
+  const fx = scaffold({ lint: 'touch lint.ran' });
+  try {
+    const child = spawn(process.execPath, [GATE, '--force'], {
+      cwd: fx.root,
+      stdio: ['pipe', 'ignore', 'ignore'],
+      env: { ...process.env, HARNESS_EVENTS_DIR: fx.eventsDir },
+    });
+    const status = await new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        child.kill();
+        resolve('hung');
+      }, 10_000);
+      child.on('exit', (code) => {
+        clearTimeout(timer);
+        resolve(code);
+      });
+    });
+    child.stdin.destroy();
+    assert.equal(status, 0, 'gate must exit on its own while stdin is still open');
+    assert.ok(existsSync(join(fx.root, 'lint.ran')));
+  } finally {
+    rmSync(fx.root, { recursive: true, force: true });
+  }
+});
+
+test('hook input written without closing stdin is still read', async () => {
+  // Like the Stop hook, but the writer keeps stdin open after sending JSON.
+  const fx = scaffold({ lint: 'touch lint.ran' });
+  try {
+    const child = spawn(process.execPath, [GATE, '--force'], {
+      cwd: fx.root,
+      stdio: ['pipe', 'ignore', 'ignore'],
+      env: { ...process.env, HARNESS_EVENTS_DIR: fx.eventsDir },
+    });
+    child.stdin.write('{"stop_hook_active": true}');
+    const status = await new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        child.kill();
+        resolve('hung');
+      }, 10_000);
+      child.on('exit', (code) => {
+        clearTimeout(timer);
+        resolve(code);
+      });
+    });
+    child.stdin.destroy();
+    assert.equal(status, 0);
+    assert.ok(!existsSync(join(fx.root, 'lint.ran')), 'loop guard honoured: steps skipped');
   } finally {
     rmSync(fx.root, { recursive: true, force: true });
   }
