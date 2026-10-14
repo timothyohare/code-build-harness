@@ -7,6 +7,7 @@
 // gate works across a Next.js app and a Lambda app.
 
 import { existsSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 
 // Walk up from startDir to find the project root. Prefer a directory that holds
@@ -17,7 +18,10 @@ export function findProjectRoot(startDir = process.cwd()) {
   let gitRoot = null;
   while (true) {
     if (existsSync(join(dir, '.claude', 'harness.json'))) return dir;
-    if (gitRoot === null && existsSync(join(dir, '.git'))) gitRoot = dir;
+    // Never adopt the shared OS temp directory as a project root. Sandboxes and
+    // test runners may mount a synthetic /tmp/.git marker that is unrelated to
+    // the temporary project below it.
+    if (gitRoot === null && dir !== tmpdir() && existsSync(join(dir, '.git'))) gitRoot = dir;
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
