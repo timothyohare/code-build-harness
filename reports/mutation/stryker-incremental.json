@@ -10,9 +10,11 @@
           "statusReason": "✖ costUsd charges input-only usage at the pricing rate (1.889143ms)\n✖ costUsd sums input and output cost (0.303453ms)\n✖ costUsd returns null when the model is absent from pricing (0.298298ms)\n✖ costUsd treats missing token counts as zero (0.196875ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 0\nℹ fail 4\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 102.570513\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (1.889143ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  undefined !== 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.303453ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  undefined !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:16:1\n✖ costUsd returns null when the model is absent from pricing (0.298298ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + undefined\n  - null\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:18:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:21:1\n✖ costUsd treats missing token counts as zero (0.196875ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  undefined !== 0\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:23:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 2,
@@ -25,15 +27,17 @@
           }
         },
         {
-          "id": "3",
-          "mutatorName": "ConditionalExpression",
-          "replacement": "false",
-          "statusReason": "✔ costUsd charges input-only usage at the pricing rate (1.074645ms)\n\n✔ costUsd sums input and output cost (1.42414ms)\n\n✖ costUsd returns null when the model is absent from pricing (0.346508ms)\n\n✔ costUsd treats missing token counts as zero (0.171804ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 3\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 133.187436\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:16:1\n✖ costUsd returns null when the model is absent from pricing (0.346508ms)\n  TypeError: Cannot read properties of undefined (reading 'in')\n      at costUsd (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/src/cost.mjs:65:288)\n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:17:16)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)\n",
+          "id": "1",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "rate",
+          "statusReason": "✖ costUsd charges input-only usage at the pricing rate (1.738084ms)\n✖ costUsd sums input and output cost (0.300077ms)\n\n✖ costUsd returns null when the model is absent from pricing (0.202052ms)\n\n✖ costUsd treats missing token counts as zero (0.245641ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 0\nℹ fail 4\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 167.151859\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (1.738084ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.300077ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:16:1\n✖ costUsd returns null when the model is absent from pricing (0.202052ms)\n  TypeError: Cannot read properties of undefined (reading 'in')\n      at costUsd (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/src/cost.mjs:65:288)\n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:17:16)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)\n\ntest at tests/cost.test.mjs:21:1\n✖ costUsd treats missing token counts as zero (0.245641ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 0\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:23:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 12,
@@ -52,9 +56,11 @@
           "statusReason": "✖ costUsd charges input-only usage at the pricing rate (2.505588ms)\n\n✖ costUsd sums input and output cost (0.338438ms)\n\n✔ costUsd returns null when the model is absent from pricing (0.328487ms)\n\n✖ costUsd treats missing token counts as zero (0.406489ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 1\nℹ fail 3\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 158.001713\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (2.505588ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.338438ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:21:1\n✖ costUsd treats missing token counts as zero (0.406489ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 0\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:23:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 12,
@@ -67,15 +73,17 @@
           }
         },
         {
-          "id": "1",
-          "mutatorName": "BooleanLiteral",
-          "replacement": "rate",
-          "statusReason": "✖ costUsd charges input-only usage at the pricing rate (1.738084ms)\n✖ costUsd sums input and output cost (0.300077ms)\n\n✖ costUsd returns null when the model is absent from pricing (0.202052ms)\n\n✖ costUsd treats missing token counts as zero (0.245641ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 0\nℹ fail 4\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 167.151859\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (1.738084ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.300077ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:16:1\n✖ costUsd returns null when the model is absent from pricing (0.202052ms)\n  TypeError: Cannot read properties of undefined (reading 'in')\n      at costUsd (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/src/cost.mjs:65:288)\n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:17:16)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)\n\ntest at tests/cost.test.mjs:21:1\n✖ costUsd treats missing token counts as zero (0.245641ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  null !== 0\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:23:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+          "id": "3",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "statusReason": "✔ costUsd charges input-only usage at the pricing rate (1.074645ms)\n\n✔ costUsd sums input and output cost (1.42414ms)\n\n✖ costUsd returns null when the model is absent from pricing (0.346508ms)\n\n✔ costUsd treats missing token counts as zero (0.171804ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 3\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 133.187436\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:16:1\n✖ costUsd returns null when the model is absent from pricing (0.346508ms)\n  TypeError: Cannot read properties of undefined (reading 'in')\n      at costUsd (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/src/cost.mjs:65:288)\n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:17:16)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 12,
@@ -94,9 +102,11 @@
           "statusReason": "✖ costUsd charges input-only usage at the pricing rate (1.806645ms)\n✖ costUsd sums input and output cost (0.348784ms)\n✔ costUsd returns null when the model is absent from pricing (0.208565ms)\n✖ costUsd treats missing token counts as zero (0.245237ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 1\nℹ fail 3\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 104.280734\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (1.806645ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.348784ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  5 !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:21:1\n✖ costUsd treats missing token counts as zero (0.245237ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  NaN !== 0\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:23:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: NaN,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 40,
@@ -109,36 +119,17 @@
           }
         },
         {
-          "id": "6",
-          "mutatorName": "ArithmeticOperator",
-          "replacement": "(tokensIn * rate.in + tokensOut * rate.out) * 1_000_000",
-          "statusReason": "✖ costUsd charges input-only usage at the pricing rate (1.78409ms)\n✖ costUsd sums input and output cost (0.386272ms)\n\n✔ costUsd returns null when the model is absent from pricing (0.219288ms)\n✔ costUsd treats missing token counts as zero (0.157889ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 2\nℹ fail 2\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 101.531905\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (1.78409ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + 5000000000000\n  - 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5000000000000,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.386272ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + 7500000000000\n  - 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 7500000000000,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
-          "status": "Killed",
-          "testsCompleted": 1,
-          "killedBy": [
-            "0"
-          ],
-          "location": {
-            "end": {
-              "column": 65,
-              "line": 14
-            },
-            "start": {
-              "column": 10,
-              "line": 14
-            }
-          }
-        },
-        {
           "id": "5",
           "mutatorName": "LogicalOperator",
           "replacement": "usage.tokens_out && 0",
           "statusReason": "✔ costUsd charges input-only usage at the pricing rate (1.137697ms)\n\n✖ costUsd sums input and output cost (0.926649ms)\n✔ costUsd returns null when the model is absent from pricing (0.15703ms)\n✖ costUsd treats missing token counts as zero (0.265095ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 2\nℹ fail 2\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 127.164421\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.926649ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  2.5 !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 2.5,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:21:1\n✖ costUsd treats missing token counts as zero (0.265095ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  NaN !== 0\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:23:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: NaN,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 42,
@@ -151,15 +142,40 @@
           }
         },
         {
+          "id": "6",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "(tokensIn * rate.in + tokensOut * rate.out) * 1_000_000",
+          "statusReason": "✖ costUsd charges input-only usage at the pricing rate (1.78409ms)\n✖ costUsd sums input and output cost (0.386272ms)\n\n✔ costUsd returns null when the model is absent from pricing (0.219288ms)\n✔ costUsd treats missing token counts as zero (0.157889ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 2\nℹ fail 2\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 101.531905\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (1.78409ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + 5000000000000\n  - 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5000000000000,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.386272ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + 7500000000000\n  - 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 7500000000000,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "static": false,
+          "killedBy": [
+            "0"
+          ],
+          "coveredBy": [],
+          "location": {
+            "end": {
+              "column": 65,
+              "line": 14
+            },
+            "start": {
+              "column": 10,
+              "line": 14
+            }
+          }
+        },
+        {
           "id": "7",
           "mutatorName": "ArithmeticOperator",
           "replacement": "tokensIn * rate.in - tokensOut * rate.out",
           "statusReason": "✔ costUsd charges input-only usage at the pricing rate (1.121731ms)\n\n✖ costUsd sums input and output cost (0.9497ms)\n\n✔ costUsd returns null when the model is absent from pricing (0.155037ms)\n✔ costUsd treats missing token counts as zero (0.152013ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 3\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 94.753099\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.9497ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  -2.5 !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: -2.5,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 52,
@@ -178,9 +194,11 @@
           "statusReason": "✖ costUsd charges input-only usage at the pricing rate (1.841023ms)\n\n✖ costUsd sums input and output cost (0.376339ms)\n✔ costUsd returns null when the model is absent from pricing (0.198352ms)\n✔ costUsd treats missing token counts as zero (0.145189ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 2\nℹ fail 2\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 76.943784\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:6:1\n✖ costUsd charges input-only usage at the pricing rate (1.841023ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0.2 !== 5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:8:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.start (node:internal/test_runner/test:1096:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0.2,\n    expected: 5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.376339ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  5.1 !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5.1,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 29,
@@ -199,9 +217,11 @@
           "statusReason": "✔ costUsd charges input-only usage at the pricing rate (1.139249ms)\n\n✖ costUsd sums input and output cost (0.987586ms)\n\n✔ costUsd returns null when the model is absent from pricing (0.188359ms)\n✔ costUsd treats missing token counts as zero (0.171802ms)\n\nℹ tests 4\nℹ suites 0\nℹ pass 3\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 82.954784\n\n✖ failing tests:\n\ntest at tests/cost.test.mjs:11:1\n✖ costUsd sums input and output cost (0.987586ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  2.508 !== 7.5\n  \n      at TestContext.<anonymous> (file:///home/timohare/dev/newdev/code-build-harness/.stryker-tmp/sandbox-oYKnKP/tests/cost.test.mjs:13:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1201:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)\n      at Test.postRun (node:internal/test_runner/test:1330:19)\n      at Test.run (node:internal/test_runner/test:1258:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 2.508,\n    expected: 7.5,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
           "status": "Killed",
           "testsCompleted": 1,
+          "static": false,
           "killedBy": [
             "0"
           ],
+          "coveredBy": [],
           "location": {
             "end": {
               "column": 52,
