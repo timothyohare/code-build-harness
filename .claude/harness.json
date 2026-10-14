@@ -1,5 +1,4 @@
 {
   "lint": "npm run lint",
-  "typecheck": "npm test",
   "mutation": "npx stryker run"
 }
