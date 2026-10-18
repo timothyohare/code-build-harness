@@ -1,0 +1,38 @@
+# Nightly API fuzz run (CHG-0033, spec: gate-fuzz). The fuzz gate is
+# on-demand for development; this scheduled run is the drift net — new code,
+# new schemathesis checks, or dependency updates that break the API contract
+# surface here instead of in production. Same shape as nrl-predictor's
+# nightly-fuzz.yml. The boot is fully fixtured (fuzzEnv: USE_FIXTURES=1,
+# MOCK_LLM=1, no DynamoDB), so no secrets or services are needed. Failure
+# notifies via GitHub's scheduled-workflow failure email. Manual trigger:
+# workflow_dispatch.
+name: nightly-fuzz
+
+on:
+  schedule:
+    - cron: "30 17 * * *" # 03:30 AEST — quiet hours, staggered after nrl-predictor
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    # Normal run is a Next build + boot + fuzz; a hung boot or a wedged
+    # schemathesis container should fail fast, not burn 6h of runner minutes.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Check out the harness (gate implementation)
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: timothyohare/code-build-harness
+          path: .harness
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Run gate-fuzz
+        run: node .harness/harness/gates/fuzz.mjs
